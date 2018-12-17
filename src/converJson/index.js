@@ -10,6 +10,7 @@ module.exports = function converJson(dir, aimType) {
         console.log('No aim type, do nothing...');
         return false;
     }
+    console.log('Convering the json files...');
     util.recursiveReadDir(dir, handleJson(aimType));
 }
 
@@ -17,8 +18,10 @@ module.exports = function converJson(dir, aimType) {
 function handleJson(aimType) {
     // 这里可以针对不同的aimType做处理
     return function (filePath) {
-        if (path.extname(filePath) === 'json') {
+        if (path.extname(filePath) === '.json') {
             // 对json处理
+            // TODO
+            console.log(filePath);
         }
     }
 }

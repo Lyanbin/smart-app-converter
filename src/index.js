@@ -23,6 +23,7 @@ module.exports = async function converApp(entryDir, outDir, aimType) {
     fs.ensureDirSync(outDir);
     fs.emptyDirSync(outDir);
     // copy整个项目
+    console.log('Copying the total dir...');
     fs.copySync(entryDir, outDir);
     await converExtname(outDir, aimType);
     await converJson(outDir, aimType);
