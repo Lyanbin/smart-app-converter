@@ -9,13 +9,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["weixin", "zhifubao", "baidu", "smartapp"],
+  "keywords": [
+    "weixin",
+    "zhifubao",
+    "baidu",
+    "smartapp"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-traverse": "^6.26.0",
+    "babel-types": "^6.26.0",
+    "babylon": "^6.18.0",
     "chalk": "^2.4.1",
     "commander": "^2.19.0",
     "fs-extra": "^7.0.1",
-    "glob": "^7.1.3"
+    "glob": "^7.1.3",
+    "less": "^3.9.0"
   }
 }

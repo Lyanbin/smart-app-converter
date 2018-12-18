@@ -1,7 +1,6 @@
 /**
  * @file 处理json文件的差异
  */
-const fs = require('fs-extra');
 const path = require('path');
 const util = require('../util.js');
 
@@ -21,7 +20,8 @@ function handleJson(aimType) {
         if (path.extname(filePath) === '.json') {
             // 对json处理
             // TODO
-            console.log(filePath);
+            // 可以替换appid、appkey之类的
+            // console.log(filePath);
         }
     }
 }

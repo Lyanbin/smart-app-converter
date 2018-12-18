@@ -3,7 +3,7 @@
  */
 const fs = require('fs-extra');
 // const path = require('path');
-const config = require('./config.js');
+const config = require('../config.js');
 const util = require('../util.js');
 module.exports = async function converExtname(dir, aimType) {
     if (!aimType) {
