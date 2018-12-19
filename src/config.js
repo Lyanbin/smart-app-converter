@@ -7,18 +7,21 @@ module.exports = {
         templ: 'swan',
         json: 'json',
         js: 'js',
-        style: 'css'
+        style: 'css',
+        class: 'swan'
     },
     weixin: {
         templ: 'wxml',
         json: 'json',
         js: 'js',
-        style: 'wxss'
+        style: 'wxss',
+        class: 'wx'
     },
     zhifubao: {
         templ: 'axml',
         json: 'json',
         js: 'js',
-        style: 'acss'
+        style: 'acss',
+        class: 'my'
     }
 }
