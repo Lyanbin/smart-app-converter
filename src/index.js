@@ -7,6 +7,7 @@ const converExtname = require('./converExtname/index.js');
 const converJson = require('./converJson/index.js');
 const converStyle = require('./converStyle/index.js');
 const converJs = require('./converJs/index.js');
+const converTempl = require('./converTemplate/index.js');
 module.exports = async function converApp(entryDir, outDir, aimType) {
     // 目录判断，参数判断是否正确
     outDir = outDir ? outDir : path.join(entryDir, `../${path.basename(entryDir)}_conver_result`);
@@ -31,5 +32,6 @@ module.exports = async function converApp(entryDir, outDir, aimType) {
     await converJson(outDir, aimType);
     await converStyle(outDir, aimType);
     await converJs(outDir, aimType);
+    await converTempl(outDir, aimType);
 }
 

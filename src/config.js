@@ -8,20 +8,23 @@ module.exports = {
         json: 'json',
         js: 'js',
         style: 'css',
-        class: 'swan'
+        class: 'swan',
+        api: {}
     },
     weixin: {
         templ: 'wxml',
         json: 'json',
         js: 'js',
         style: 'wxss',
-        class: 'wx'
+        class: 'wx',
+        api: {}
     },
     zhifubao: {
         templ: 'axml',
         json: 'json',
         js: 'js',
         style: 'acss',
-        class: 'my'
+        class: 'my',
+        api: {}
     }
 }

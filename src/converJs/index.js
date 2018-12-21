@@ -9,6 +9,7 @@ const parser = require('@babel/parser');
 const fs = require('fs-extra');
 const config = require('../config');
 const generator = require('@babel/generator').default;
+const T = require('@babel/types');
 module.exports = function converJs(dir, aimType) {
     if (!aimType) {
         console.log('No aim type, do nothing...');
@@ -36,14 +37,28 @@ function handleJs(aimType) {
                 sourceType: 'module'
             });
             traverse(ast, {
-                Identifier(path) {
-                    // 对不支持的api收集，给出log提示
-                    // TODO
+                // 对不支持的api收集，给出log提示
+                // TODO
 
-                    // 替换总命名空间，应该最后做
-                    let nodeName = path.node.name;
-                    if (/^(swan|my|wx)$/.test(nodeName)) {
-                        path.node.name = aimClassType;
+                // 替换给swan当参数传入
+                CallExpression(path) {
+                    path.node.arguments.forEach(item => {
+                        if (T.isIdentifier(item)) {
+                            if (/^(swan|my|wx)$/.test(item.name)) {
+                                item.name = aimClassType;
+                            }
+                        }
+                    });
+                },
+                // 替换swan.XXX，应该最后做
+                MemberExpression(path) {
+                    if (T.isIdentifier(path.node.object)) {
+                        // 替换swan.xx、swan[xx],屏蔽swan.swan['xx']
+                        let nodeTemp = path.node.object;
+                        let nodeName = nodeTemp.name;
+                        if (/^(swan|my|wx)$/.test(nodeName)) {
+                            nodeTemp.name = aimClassType;
+                        }
                     }
                 }
             });
