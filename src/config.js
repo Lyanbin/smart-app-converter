@@ -9,7 +9,8 @@ module.exports = {
         js: 'js',
         style: 'css',
         class: 'swan',
-        api: {}
+        api: {},
+        twoWayBind: data => `{= ${data} =}`
     },
     weixin: {
         templ: 'wxml',
@@ -17,7 +18,8 @@ module.exports = {
         js: 'js',
         style: 'wxss',
         class: 'wx',
-        api: {}
+        api: {},
+        twoWayBind: data => `{{ ${data} }}`
     },
     zhifubao: {
         templ: 'axml',
@@ -25,6 +27,7 @@ module.exports = {
         js: 'js',
         style: 'acss',
         class: 'my',
-        api: {}
+        api: {},
+        twoWayBind: data => `{{ ${data} }}`
     }
 }
