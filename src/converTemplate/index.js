@@ -29,6 +29,9 @@ function handleTempl(aimType) {
     return async function (filePath) {
         if (path.extname(filePath) === `.${aimFileType}`) {
             let contentBuffer = await fs.readFile(filePath);
+            // TODO 这里需要加上注释分割
+
+            
             // 包一层做适配
             let content = `<ast-wraper>${contentBuffer.toString()}</ast-wraper>`
             if (/search.wxml/.test(filePath)) {
