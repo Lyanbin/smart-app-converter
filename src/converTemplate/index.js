@@ -63,6 +63,10 @@ function traverseTemplAst(ast, aimConfig) {
                 ast.attrs[index].value = aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
             }
         });
+    } else if (false) { // 指令转换
+
+    } else if (false) { // 自定义组件转换
+
     }
 
     if (childNodes) {
