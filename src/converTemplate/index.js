@@ -29,11 +29,15 @@ function handleTempl(aimType) {
     return async function (filePath) {
         if (path.extname(filePath) === `.${aimFileType}`) {
             let contentBuffer = await fs.readFile(filePath);
-            // TODO 这里需要加上注释分割
-
-            
+            let contentStr = contentBuffer.toString();
+            // 对保留的内容标识符修改
+            let needReg = new RegExp(`\\<\\!--${aimType} begin--\\>([\\s\\S]*?)\\<\\!--${aimType} end--\\>`, 'g');
+            contentStr = contentStr.replace(needReg, `<!--${aimType} only begin-->$1<!--${aimType} only end-->`);
+            // 正则删掉独有的内容
+            contentStr = contentStr.replace(/\<\!--(weixin|baidu|zhifubao) begin--\>[\s\S]*?\<\!--\1 end--\>/g, '');
             // 包一层做适配
-            let content = `<ast-wraper>${contentBuffer.toString()}</ast-wraper>`
+            let content = `<ast-wraper>${contentStr}</ast-wraper>`
+            // TODO 这里if做例子，后续删除
             if (/search.wxml/.test(filePath)) {
                 let ast = parse5.parseFragment(content);
                 let newAst = traverseTemplAst(ast, config[aimType]);
@@ -54,11 +58,17 @@ function traverseTemplAst(ast, aimConfig) {
     }
     // 非数组进行判断
     let {
-        tagName, attrs, childNodes
+        tagName, attrs, childNodes, nodeName, data
     } = ast;
+    // if (nodeName === '#comment' && data === 'wx begin') { // 删除片段
+    //     let parentNode = ast.parentNode || {};
+    //     let peerNode = parentNode.childNodes || [];
+    //     ast.parentNode.childNodes = removeIncoherentNode(peerNode, aimConfig);
+    // }
     if (/^(?:import|include)$/.test(tagName)) { // 这些模板需要替换后缀
         ast = mapImport(ast, aimConfig.templ);
-    } else if (twoWayBindTag[tagName]) { // 这些标签需要处理双向绑定的问题
+    }
+    if (twoWayBindTag[tagName]) { // 这些标签需要处理双向绑定的问题
         const twoWayBindAttr = twoWayBindTag[tagName];
         attrs.forEach((attr, index) => {
             let attrValue = ast.attrs[index].value;
@@ -66,9 +76,12 @@ function traverseTemplAst(ast, aimConfig) {
                 ast.attrs[index].value = aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
             }
         });
-    } else if (false) { // 指令转换
+    }
 
-    } else if (false) { // 自定义组件转换
+    if (false) { // 指令转换
+
+    }
+    if (false) { // 自定义组件转换
 
     }
 
@@ -93,3 +106,26 @@ function mapImport(ast, aimTempl) {
     }
     return ast;
 }
+
+// function removeIncoherentNode(astArr, config) {
+//     let type = config.type;
+//     let beginFlag = `${type} begin`;
+//     let endFlag = `${type} end`;
+//     let beginIndex = -1;
+//     let endIndex = -1;
+
+//     for (let i = 0; i < astArr.length; i++) {
+//         const node = astArr[i];
+//         if (node.nodeName === '#comment') {
+//             if (node.data === beginFlag) {
+//                 beginIndex = i;
+//             }
+//             if (node.data === endFlag) {
+//                 endIndex = i;
+//             }
+//         }
+//     }
+//     if (~beginIndex && endIndex > beginIndex) {
+//         astArr
+//     }
+// }

@@ -4,6 +4,7 @@
 
 module.exports = {
     baidu: {
+        type: 'baidu',
         templ: 'swan',
         json: 'json',
         js: 'js',
@@ -13,6 +14,7 @@ module.exports = {
         twoWayBind: data => `{= ${data} =}`
     },
     weixin: {
+        type: 'weixin',
         templ: 'wxml',
         json: 'json',
         js: 'js',
@@ -22,6 +24,7 @@ module.exports = {
         twoWayBind: data => `{{ ${data} }}`
     },
     zhifubao: {
+        type: 'zhifubao',
         templ: 'axml',
         json: 'json',
         js: 'js',

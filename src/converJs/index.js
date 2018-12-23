@@ -30,7 +30,7 @@ function handleJs(aimType) {
             let content = contentBuffer.toString();
             // 对保留的内容标识符修改
             let needReg = new RegExp(`/\\*{3}${aimType} begin\\*{3}/([\\s\\S]*?)/\\*{3}${aimType} end\\*{3}/`, 'g');
-            content = content.replace(needReg, `/**${aimType}**/$1/**${aimType}**/`);
+            content = content.replace(needReg, `/**${aimType} only begin**/$1/**${aimType} only end**/`);
             // 正则删掉独有的内容
             content = content.replace(/\/\*{3}(weixin|baidu|zhifubao) begin\*{3}\/[\s\S]*?\/\*{3}\1 end\*{3}\//g, '');
             let ast = parser.parse(content, {
