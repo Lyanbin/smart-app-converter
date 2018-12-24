@@ -13,15 +13,15 @@ module.exports = function converJson(dir, aimType) {
     }
     console.log('Convering the style files...');
     util.recursiveReadDir(dir, handleJson(aimType));
-}
+};
 
 
 function handleJson(aimType) {
     // 这里可以针对不同的aimType做处理
     // const aimFileType = config[aimType].style;
     return async function (filePath) {
-        if (path.extname(filePath) === `.less`) {
-            
+        if (path.extname(filePath) === '.less') {
+
             // 对style处理
             let content = fs.readFileSync(filePath).toString();
             let lessRes = '';
@@ -41,5 +41,5 @@ function handleJson(aimType) {
             await fs.ensureFile(cssPath);
             fs.writeFile(cssPath, css);
         }
-    }
+    };
 }

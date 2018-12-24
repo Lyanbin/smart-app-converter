@@ -33,4 +33,4 @@ module.exports = {
         api: {},
         twoWayBind: data => `{{ ${data} }}`
     }
-}
+};

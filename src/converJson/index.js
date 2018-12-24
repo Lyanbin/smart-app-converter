@@ -11,7 +11,7 @@ module.exports = function converJson(dir, aimType) {
     }
     console.log('Convering the json files...');
     util.recursiveReadDir(dir, handleJson(aimType));
-}
+};
 
 
 function handleJson(aimType) {
@@ -23,5 +23,5 @@ function handleJson(aimType) {
             // 可以替换appid、appkey之类的
             // console.log(filePath);
         }
-    }
+    };
 }

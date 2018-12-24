@@ -8,15 +8,15 @@ program.version(packageJson.version)
     .option('-w --weixin <entryDir> [outputDir]', 'Get weixin mini program')
     .option('-z --zhifubao <entryDir> [outputDir]', 'Get zhifubao mini program')
     .option('-b --baidu <entryDir> [outputDir]', 'Get baidu mini program')
-    .usage(`${chalk.green('<entryDir>')} ${chalk.green('[outputDir]')}`)
+    .usage(`${chalk.green('<entryDir>')} ${chalk.green('[outputDir]')}`);
 
 program.parse(process.argv);
 
-if(program.weixin){
-    parseParam(program.weixin)
-} else if(program.baidu){
+if (program.weixin) {
+    parseParam(program.weixin);
+} else if (program.baidu) {
     console.log(`${chalk.red('not support baidu.')}`);
-} else if(program.zhifubao){
+} else if (program.zhifubao) {
     console.log(`${chalk.red('not support zhifubao.')}`);
 } else {
     console.log(`${chalk.red('what do u want?')}`);

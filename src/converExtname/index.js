@@ -12,7 +12,7 @@ module.exports = async function converExtname(dir, aimType) {
     }
     console.log('Convering the extnames...');
     util.recursiveReadDir(dir, changeExtname(aimType));
-}
+};
 
 function changeExtname(aimType) {
     const aimFileType = config[aimType];
@@ -28,5 +28,5 @@ function changeExtname(aimType) {
             let newPath = filePath.replace(styleReg, aimFileType.style);
             fs.renameSync(filePath, newPath);
         }
-    }
+    };
 }

@@ -36,29 +36,32 @@ function handleTempl(aimType) {
             // 正则删掉独有的内容
             contentStr = contentStr.replace(/\<\!--(weixin|baidu|zhifubao) begin--\>[\s\S]*?\<\!--\1 end--\>/g, '');
             // 包一层做适配
-            let content = `<ast-wraper>${contentStr}</ast-wraper>`
+            let content = `<ast-wraper>${contentStr}</ast-wraper>`;
             // TODO 这里if做例子，后续删除
             if (/search.wxml/.test(filePath)) {
                 let ast = parse5.parseFragment(content);
                 let newAst = traverseTemplAst(ast, config[aimType]);
                 let newContent = parse5.serialize(newAst.childNodes[0]);
-                
-                fs.writeFile(filePath, newContent)
+                fs.writeFile(filePath, newContent);
             }
         }
-    }
+    };
 }
 
 function traverseTemplAst(ast, aimConfig) {
     // 数组继续递归
     if (Array.isArray(ast)) {
-        return ast.map((item) => {
+        return ast.map(item => {
             traverseTemplAst(item, aimConfig);
-        })
+        });
     }
     // 非数组进行判断
     let {
-        tagName, attrs, childNodes, nodeName, data
+        tagName,
+        attrs,
+        childNodes,
+        nodeName,
+        data
     } = ast;
     // if (nodeName === '#comment' && data === 'wx begin') { // 删除片段
     //     let parentNode = ast.parentNode || {};
@@ -92,9 +95,7 @@ function traverseTemplAst(ast, aimConfig) {
 }
 
 function mapImport(ast, aimTempl) {
-    let {
-        attrs
-    } = ast;
+    let attrs = ast.attrs;
     for (let i = 0; i < attrs.length; i++) {
         if (attrs[i].name === 'src' && attrs[i].value) {
             attrs[i].value = attrs[i].value.replace(/(?:wxml|swan|axml)$/, aimTempl);
@@ -106,26 +107,3 @@ function mapImport(ast, aimTempl) {
     }
     return ast;
 }
-
-// function removeIncoherentNode(astArr, config) {
-//     let type = config.type;
-//     let beginFlag = `${type} begin`;
-//     let endFlag = `${type} end`;
-//     let beginIndex = -1;
-//     let endIndex = -1;
-
-//     for (let i = 0; i < astArr.length; i++) {
-//         const node = astArr[i];
-//         if (node.nodeName === '#comment') {
-//             if (node.data === beginFlag) {
-//                 beginIndex = i;
-//             }
-//             if (node.data === endFlag) {
-//                 endIndex = i;
-//             }
-//         }
-//     }
-//     if (~beginIndex && endIndex > beginIndex) {
-//         astArr
-//     }
-// }

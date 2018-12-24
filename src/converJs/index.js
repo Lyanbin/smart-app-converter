@@ -17,7 +17,7 @@ module.exports = function converJs(dir, aimType) {
     }
     console.log('Convering the js files...');
     util.recursiveReadDir(dir, handleJs(aimType));
-}
+};
 
 
 function handleJs(aimType) {
@@ -65,5 +65,5 @@ function handleJs(aimType) {
             let newCode = generator(ast, {});
             fs.writeFile(filePath, newCode.code);
         }
-    }
+    };
 }
