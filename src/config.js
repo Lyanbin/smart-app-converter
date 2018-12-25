@@ -11,7 +11,8 @@ module.exports = {
         style: 'css',
         class: 'swan',
         api: {},
-        twoWayBind: data => `{= ${data} =}`
+        twoWayBind: data => `{= ${data} =}`,
+        event: eventName => `bind${eventName}`
     },
     weixin: {
         type: 'weixin',
@@ -21,7 +22,8 @@ module.exports = {
         style: 'wxss',
         class: 'wx',
         api: {},
-        twoWayBind: data => `{{ ${data} }}`
+        twoWayBind: data => `{{ ${data} }}`,
+        event: eventName => `bind${eventName}`
     },
     zhifubao: {
         type: 'zhifubao',
@@ -31,6 +33,10 @@ module.exports = {
         style: 'acss',
         class: 'my',
         api: {},
-        twoWayBind: data => `{{ ${data} }}`
+        twoWayBind: data => `{{ ${data} }}`,
+        event: eventName => {
+            eventName = eventName.trim().replace(/^[a-z]/g, (L) => L.toUpperCase());
+            return `on${eventName}`;
+        }
     }
 };

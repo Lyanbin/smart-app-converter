@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const util = require('../util.js');
 const config = require('../config.js');
-const parse5 = require('parse5');
+const htmlparser = require("htmlparser2");
 const twoWayBindTag = {
     'scroll-view': ['scroll-top', 'scroll-left', 'scroll-into-view'],
     'input': ['value'],
@@ -39,9 +39,17 @@ function handleTempl(aimType) {
             let content = `<ast-wraper>${contentStr}</ast-wraper>`;
             // TODO 这里if做例子，后续删除
             if (/search.wxml/.test(filePath)) {
-                let ast = parse5.parseFragment(content);
+                const DomHandler = new htmlparser.DomHandler();
+                const Parser = new htmlparser.Parser(DomHandler, {
+                    xmlMode: false,
+                    lowerCaseAttributeNames: false,
+                    recognizeSelfClosing: true,
+                    lowerCaseTags: false
+                });
+                Parser.end(content);
+                let ast = DomHandler.dom;
                 let newAst = traverseTemplAst(ast, config[aimType]);
-                let newContent = parse5.serialize(newAst.childNodes[0]);
+                let newContent = returnHtmlFromAst(newAst);
                 fs.writeFile(filePath, newContent);
             }
         }
@@ -51,59 +59,125 @@ function handleTempl(aimType) {
 function traverseTemplAst(ast, aimConfig) {
     // 数组继续递归
     if (Array.isArray(ast)) {
-        return ast.map(item => {
-            traverseTemplAst(item, aimConfig);
+        ast.map(item => {
+            return traverseTemplAst(item, aimConfig);
         });
     }
     // 非数组进行判断
     let {
-        tagName,
-        attrs,
-        childNodes,
-        nodeName,
-        data
+        name,
+        attribs,
+        children
     } = ast;
-    // if (nodeName === '#comment' && data === 'wx begin') { // 删除片段
-    //     let parentNode = ast.parentNode || {};
-    //     let peerNode = parentNode.childNodes || [];
-    //     ast.parentNode.childNodes = removeIncoherentNode(peerNode, aimConfig);
-    // }
-    if (/^(?:import|include)$/.test(tagName)) { // 这些模板需要替换后缀
+    if (/^(?:import|include)$/.test(name)) { // 这些模板需要替换后缀
         ast = mapImport(ast, aimConfig.templ);
     }
-    if (twoWayBindTag[tagName]) { // 这些标签需要处理双向绑定的问题
-        const twoWayBindAttr = twoWayBindTag[tagName];
-        attrs.forEach((attr, index) => {
-            let attrValue = ast.attrs[index].value;
-            if (~twoWayBindAttr.indexOf(attr.name) && /{[{=].+[}=]}/.test(attrValue)) {
-                ast.attrs[index].value = aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
+    if (twoWayBindTag[name]) { // 这些标签需要处理双向绑定的问题
+        const twoWayBindAttr = twoWayBindTag[name];
+        Object.keys(attribs).forEach((attrKey) => {
+            let attrValue = attribs.attrKey;
+            if (~twoWayBindAttr.indexOf(attrKey) && /{[{=].+[}=]}/.test(attrValue)) {
+                ast.attribs.attrKey = aimConfig.twoWayBind && aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
             }
         });
     }
-
+    // 事件每家小程序都不太一样，要转换下
+    ast = mapEvent(ast, aimConfig.event);
     if (false) { // 指令转换
 
     }
     if (false) { // 自定义组件转换
 
     }
-
-    if (childNodes) {
-        traverseTemplAst(ast.childNodes, aimConfig);
+    if (children && children.length) {
+        traverseTemplAst(ast.children, aimConfig);
     }
     return ast;
 }
 
 function mapImport(ast, aimTempl) {
-    let attrs = ast.attrs;
-    for (let i = 0; i < attrs.length; i++) {
-        if (attrs[i].name === 'src' && attrs[i].value) {
-            attrs[i].value = attrs[i].value.replace(/(?:wxml|swan|axml)$/, aimTempl);
-            if (!/\w+\.\w+/.test(attrs[i].value)) {
-                attrs[i].value += `.${aimTempl}`;
+    let attrs = ast.attribs;
+    for (let item in attrs) {
+        if (item === 'src' && attrs[item]) {
+            attrs[item] = attrs[item].replace(/(?:wxml|swan|axml)$/, aimTempl);
+            if (!/\w+\.\w+/.test(attrs[item])) {
+                attrs[item] += `.${aimTempl}`;
             }
             break;
         }
     }
     return ast;
+}
+
+function mapEvent(ast, aimEvent) {
+    let attribs = ast.attribs;
+    let reg = /(?:bind|catch|on):?(\w+)/;
+    for (let item in attribs) {
+        if (reg.test(item)) {
+            let eventName = item.match(reg)[1];
+            let event = attribs[item];
+            let newEventName = aimEvent && aimEvent(eventName);
+            attribs[newEventName] = event;
+            delete attribs[item];
+        }
+    }
+    return ast;
+}
+
+
+function returnHtmlFromAst(ast) {
+    if (!ast) {
+        return '';
+    }
+    if (Array.isArray(ast)) {
+        let res = '';
+        ast.map((item, index) => {
+            res += returnHtmlFromAst(item);
+        });
+        return res;
+    }
+    let {
+        type,
+        data,
+        name,
+        children
+    } = ast;
+    switch (type) {
+        case 'tag': {
+            if (name === 'ast-wraper') {
+                return returnHtmlFromAst(children);
+            }
+            let str = '';
+            children.map((item, index) => {
+                str += returnHtmlFromAst(item);
+            });
+            return astNodeToString(ast, str);
+        }
+        case 'text':
+            return data;
+        case 'comment':
+            return `<!--${data}-->`;
+    }
+}
+
+function astNodeToString(astNode, content) {
+    let {
+        name,
+        attribs,
+        singleQuoteAttribs = {},
+        selfClose
+    } = astNode;
+    let attrStr = attrsToString(attribs, singleQuoteAttribs);
+    let tempStr = `${name} ${attrStr}`
+    return selfClose && !content ? `<${tempStr} />` : `<${tempStr}>${content}</${name}>`
+}
+
+
+function attrsToString(attrs = {}, singleQuoteAttribs) {
+    let resArr = [];
+    for (let item in attrs) {
+        let value = attrs[item];
+        resArr.push(`${item}="${value}"`);
+    }
+    return resArr.join(' ');
 }
