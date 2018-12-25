@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const util = require('../util.js');
 const config = require('../config.js');
-const htmlparser = require("htmlparser2");
+const htmlparser = require('htmlparser2');
 const twoWayBindTag = {
     'scroll-view': ['scroll-top', 'scroll-left', 'scroll-into-view'],
     'input': ['value'],
@@ -168,8 +168,8 @@ function astNodeToString(astNode, content) {
         selfClose
     } = astNode;
     let attrStr = attrsToString(attribs, singleQuoteAttribs);
-    let tempStr = `${name} ${attrStr}`
-    return selfClose && !content ? `<${tempStr} />` : `<${tempStr}>${content}</${name}>`
+    let tempStr = `${name} ${attrStr}`;
+    return selfClose && !content ? `<${tempStr} />` : `<${tempStr}>${content}</${name}>`;
 }
 
 
