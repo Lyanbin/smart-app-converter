@@ -11,19 +11,20 @@ program.version(packageJson.version)
     .usage(`${chalk.green('<entryDir>')} ${chalk.green('[outputDir]')}`);
 
 program.parse(process.argv);
-
 if (program.weixin) {
-    parseParam(program.weixin);
+    parseParam(program.weixin, 'weixin');
 } else if (program.baidu) {
-    console.log(`${chalk.red('not support baidu.')}`);
+    console.log(`${chalk.red('not support baidu now.')}`);
 } else if (program.zhifubao) {
-    console.log(`${chalk.red('not support zhifubao.')}`);
-} else {
-    console.log(`${chalk.red('what do u want?')}`);
+    console.log(`${chalk.red('not support zhifubao now.')}`);
 }
 
-function parseParam(entryDir) {
+function parseParam(entryDir, aim) {
+    if (!aim) {
+        console.log(`${chalk.red('what do u want?')}`);
+        return;
+    }
     let resolvedEntryDir = path.resolve(entryDir);
     let resolvedOutDir = program.args[0] ? path.resolve(program.args[0]) : null;
-    converApp(resolvedEntryDir, resolvedOutDir, 'weixin');
+    converApp(resolvedEntryDir, resolvedOutDir, aim);
 }
