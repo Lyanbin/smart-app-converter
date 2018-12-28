@@ -72,6 +72,9 @@ function traverseTemplAst(ast, aimConfig) {
     if (/^(?:import|include)$/.test(name)) { // 这些模板需要替换后缀
         ast = mapImport(ast, aimConfig.templ);
     }
+    if (/^(?:ad|track-log)$/.test(name) && aimConfig.type !== 'baidu') { // 广告和统计是百度私有的
+        ast.name = 'view';
+    }
     if (twoWayBindTag[name]) { // 这些标签需要处理双向绑定的问题
         const twoWayBindAttr = twoWayBindTag[name];
         Object.keys(attribs).forEach((attrKey) => {
@@ -83,9 +86,9 @@ function traverseTemplAst(ast, aimConfig) {
     }
     // 事件每家小程序都不太一样，要转换下
     ast = mapEvent(ast, aimConfig.event);
-    if (false) { // 指令转换
+    // 指令转换
+    ast = mapDirection(ast, aimConfig);
 
-    }
     if (false) { // 自定义组件转换
 
     }
@@ -124,6 +127,37 @@ function mapEvent(ast, aimEvent) {
     return ast;
 }
 
+function mapDirection(ast, aimConfig) {
+    let attribs = ast.attribs;
+    let aimPerfix = aimConfig.directivePerfix;
+    let reg = /(wx:|a:|s-)(elif|else-if|if|else|for|for-index|for-item|key)/;
+    let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackby\s+(\S+))?\s*$/;
+    for (let item in attribs) {
+        if (reg.test(item)) {
+            let perfix = item.match(reg)[1];
+            let dirName = item.match(reg)[2];
+            let newDir = `${aimPerfix}${dirName}`;
+            if (/^(?:else-if|elif)$/.test(dirName)) {
+                newDir = `${aimPerfix}${aimConfig.if.elseif}`
+                console.log(newDir);
+            }
+            attribs[newDir] = attribs[item];
+            if (baiduForReg.test(attribs[item]) && aimPerfix !== 's-') {
+                let regRes = attribs[item].match(baiduForReg);
+                let forArr = regRes[3];
+                let forIndex = regRes[2];
+                let forItem = regRes[1];
+                let forKey = regRes[4];
+                attribs[`${aimPerfix}for`] = forArr;
+                forIndex && forIndex !== 'index' && (attribs[`${aimPerfix}for-index`] = forIndex);
+                forItem && forItem !== 'item' && (attribs[`${aimPerfix}for-item`] = forItem);
+                forKey && (attribs[`${aimPerfix}key`] = forKey);
+            }
+            delete attribs[item];
+        }
+    }
+    return ast;
+}
 
 function returnHtmlFromAst(ast) {
     if (!ast) {
@@ -177,7 +211,8 @@ function attrsToString(attrs = {}, singleQuoteAttribs) {
     let resArr = [];
     for (let item in attrs) {
         let value = attrs[item];
-        resArr.push(`${item}="${value}"`);
+        let attStr = value ? `${item}="${value}"` : item;
+        resArr.push(attStr);
     }
     return resArr.join(' ');
 }

@@ -12,7 +12,11 @@ module.exports = {
         class: 'swan',
         api: {},
         twoWayBind: data => `{= ${data} =}`,
-        event: eventName => `bind${eventName}`
+        event: eventName => `bind${eventName}`,
+        directivePerfix: 's-',
+        if: {
+            elseif: 'else-if'
+        }
     },
     weixin: {
         type: 'weixin',
@@ -23,7 +27,11 @@ module.exports = {
         class: 'wx',
         api: {},
         twoWayBind: data => `{{ ${data} }}`,
-        event: eventName => `bind${eventName}`
+        event: eventName => `bind${eventName}`,
+        directivePerfix: 'wx:',
+        if: {
+            elseif: 'elif'
+        }
     },
     zhifubao: {
         type: 'zhifubao',
@@ -37,6 +45,10 @@ module.exports = {
         event: eventName => {
             eventName = eventName.trim().replace(/^[a-z]/g, (L) => L.toUpperCase());
             return `on${eventName}`;
+        },
+        directivePerfix: 'a:',
+        if: {
+            elseif: 'elif'
         }
     }
 };
