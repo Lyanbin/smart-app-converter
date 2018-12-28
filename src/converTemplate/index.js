@@ -137,7 +137,7 @@ function mapDirection(ast, aimConfig) {
             let dirName = item.match(reg)[2];
             let newDir = `${aimPerfix}${dirName}`;
             if (/^(?:else-if|elif)$/.test(dirName)) {
-                newDir = `${aimPerfix}${aimConfig.if.elseif}`
+                newDir = `${aimPerfix}${aimConfig.if.elseif}`;
             }
             attribs[newDir] = attribs[item];
             if (baiduForReg.test(attribs[item]) && aimPerfix !== 's-') {
