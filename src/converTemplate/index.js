@@ -134,12 +134,10 @@ function mapDirection(ast, aimConfig) {
     let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackby\s+(\S+))?\s*$/;
     for (let item in attribs) {
         if (reg.test(item)) {
-            let perfix = item.match(reg)[1];
             let dirName = item.match(reg)[2];
             let newDir = `${aimPerfix}${dirName}`;
             if (/^(?:else-if|elif)$/.test(dirName)) {
                 newDir = `${aimPerfix}${aimConfig.if.elseif}`
-                console.log(newDir);
             }
             attribs[newDir] = attribs[item];
             if (baiduForReg.test(attribs[item]) && aimPerfix !== 's-') {
