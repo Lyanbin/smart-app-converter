@@ -131,25 +131,28 @@ function mapDirection(ast, aimConfig) {
     let attribs = ast.attribs;
     let aimPerfix = aimConfig.directivePerfix;
     let reg = /(wx:|a:|s-)(elif|else-if|if|else|for|for-index|for-item|key)/;
+    let bracketsReg = /{{([^{]+)}}/;
     let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackby\s+(\S+))?\s*$/;
     for (let item in attribs) {
+        // 括号扒掉
+        attribs[item] = attribs[item].replace(bracketsReg, '$1');
         if (reg.test(item)) {
             let dirName = item.match(reg)[2];
             let newDir = `${aimPerfix}${dirName}`;
             if (/^(?:else-if|elif)$/.test(dirName)) {
-                newDir = `${aimPerfix}${aimConfig.if.elseif}`;
+                newDir = `${aimPerfix}${aimConfig.directiveIf.elseif}`;
             }
-            attribs[newDir] = attribs[item];
+            attribs[newDir] = aimConfig.directiveBrackets(attribs[item]);
             if (baiduForReg.test(attribs[item]) && aimPerfix !== 's-') {
                 let regRes = attribs[item].match(baiduForReg);
                 let forArr = regRes[3];
                 let forIndex = regRes[2];
                 let forItem = regRes[1];
                 let forKey = regRes[4];
-                attribs[`${aimPerfix}for`] = forArr;
-                forIndex && forIndex !== 'index' && (attribs[`${aimPerfix}for-index`] = forIndex);
-                forItem && forItem !== 'item' && (attribs[`${aimPerfix}for-item`] = forItem);
-                forKey && (attribs[`${aimPerfix}key`] = forKey);
+                attribs[`${aimPerfix}for`] = aimConfig.directiveBrackets(forArr);
+                forIndex && forIndex !== 'index' && (attribs[`${aimPerfix}for-index`] = aimConfig.directiveBrackets(forIndex));
+                forItem && forItem !== 'item' && (attribs[`${aimPerfix}for-item`] = aimConfig.directiveBrackets(forItem));
+                forKey && (attribs[`${aimPerfix}key`] = aimConfig.directiveBrackets(forKey));
             }
             delete attribs[item];
         }

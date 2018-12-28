@@ -14,7 +14,8 @@ module.exports = {
         twoWayBind: data => `{= ${data} =}`,
         event: eventName => `bind${eventName}`,
         directivePerfix: 's-',
-        if: {
+        directiveBrackets: data => data,
+        directiveIf: {
             elseif: 'else-if'
         }
     },
@@ -27,9 +28,10 @@ module.exports = {
         class: 'wx',
         api: {},
         twoWayBind: data => `{{ ${data} }}`,
+        directiveBrackets: data => data ? `{{ ${data} }}` : '',
         event: eventName => `bind${eventName}`,
         directivePerfix: 'wx:',
-        if: {
+        directiveIf: {
             elseif: 'elif'
         }
     },
@@ -42,12 +44,13 @@ module.exports = {
         class: 'my',
         api: {},
         twoWayBind: data => `{{ ${data} }}`,
+        directiveBrackets: data => data ? `{{ ${data} }}` : '',
         event: eventName => {
             eventName = eventName.trim().replace(/^[a-z]/g, (L) => L.toUpperCase());
             return `on${eventName}`;
         },
         directivePerfix: 'a:',
-        if: {
+        directiveIf: {
             elseif: 'elif'
         }
     }
