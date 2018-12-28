@@ -75,6 +75,19 @@ function traverseTemplAst(ast, aimConfig) {
     if (/^(?:ad|track-log)$/.test(name) && aimConfig.type !== 'baidu') { // 广告和统计是百度私有的
         ast.name = 'view';
     }
+    if (/^(?:template)$/.test(name)) { // 百度小程序tm的data扩展需要三个花括号
+        // 没想好这里怎么写
+        // TODO
+        
+    }
+    // 后续有问题的组件，都写在这里
+    if (/^(?:rich-text)$/.test(name)) {
+        let tag = name.match(/^(rich-text)$/)[1];
+        ast.name = aimConfig.tag[tag] ? name : 'view';
+        if (!aimConfig.tag[tag]) {
+            console.log(`${tag} is not supported for your aim app...`);
+        }
+    }
     if (twoWayBindTag[name]) { // 这些标签需要处理双向绑定的问题
         const twoWayBindAttr = twoWayBindTag[name];
         Object.keys(attribs).forEach((attrKey) => {
@@ -89,7 +102,7 @@ function traverseTemplAst(ast, aimConfig) {
     // 指令转换
     ast = mapDirection(ast, aimConfig);
 
-    if (false) { // 自定义组件转换
+    if (false) { // TODO自定义组件的一些处理
 
     }
     if (children && children.length) {

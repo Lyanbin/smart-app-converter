@@ -17,6 +17,9 @@ module.exports = {
         directiveBrackets: data => data,
         directiveIf: {
             elseif: 'else-if'
+        },
+        tag: {
+            'richText': true
         }
     },
     weixin: {
@@ -33,6 +36,9 @@ module.exports = {
         directivePerfix: 'wx:',
         directiveIf: {
             elseif: 'elif'
+        },
+        tag: {
+            'rich-text': true
         }
     },
     zhifubao: {
@@ -52,6 +58,9 @@ module.exports = {
         directivePerfix: 'a:',
         directiveIf: {
             elseif: 'elif'
+        },
+        tag: {
+            'rich-text': false
         }
     }
 };
