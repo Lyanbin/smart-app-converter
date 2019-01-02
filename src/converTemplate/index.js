@@ -86,9 +86,9 @@ function traverseTemplAst(ast, aimConfig) {
     if (twoWayBindTag[name]) { // 这些标签需要处理双向绑定的问题
         const twoWayBindAttr = twoWayBindTag[name];
         Object.keys(attribs).forEach((attrKey) => {
-            let attrValue = attribs.attrKey;
+            let attrValue = attribs[attrKey];
             if (~twoWayBindAttr.indexOf(attrKey) && /{[{=].+[}=]}/.test(attrValue)) {
-                ast.attribs.attrKey = aimConfig.twoWayBind && aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
+                ast.attribs[attrKey] = aimConfig.twoWayBind && aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
             }
         });
     }
@@ -140,8 +140,8 @@ function mapEvent(ast, aimEvent) {
             let eventName = item.match(reg)[1];
             let event = attribs[item];
             let newEventName = aimEvent && aimEvent(eventName);
-            attribs[newEventName] = event;
             delete attribs[item];
+            attribs[newEventName] = event;
         }
     }
     return ast;
@@ -154,17 +154,19 @@ function mapDirection(ast, aimConfig) {
     let bracketsReg = /{{([^{]+)}}/;
     let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackBy\s+(\S+))?\s*$/;
     for (let item in attribs) {
-        // 括号扒掉
-        attribs[item] = attribs[item].replace(bracketsReg, '$1');
         if (reg.test(item)) {
+            // 括号扒掉
+            // attribs[item] = attribs[item].replace(bracketsReg, '$1');
+            let newValue = attribs[item].replace(bracketsReg, '$1');
             let dirName = item.match(reg)[2];
             let newDir = `${aimPerfix}${dirName}`;
+            delete attribs[item];
             if (/^(?:else-if|elif)$/.test(dirName)) {
                 newDir = `${aimPerfix}${aimConfig.directiveIf.elseif}`;
             }
-            attribs[newDir] = aimConfig.directiveBrackets(attribs[item]);
-            if (baiduForReg.test(attribs[item]) && aimPerfix !== 's-') {
-                let regRes = attribs[item].match(baiduForReg);
+            attribs[newDir] = aimConfig.directiveBrackets(newValue);
+            if (baiduForReg.test(newValue) && aimPerfix !== 's-') {
+                let regRes = newValue.match(baiduForReg);
                 let forArr = regRes[3];
                 let forIndex = regRes[2];
                 let forItem = regRes[1];
@@ -174,7 +176,6 @@ function mapDirection(ast, aimConfig) {
                 forItem && forItem !== 'item' && (attribs[`${aimPerfix}for-item`] = aimConfig.directiveBrackets(forItem));
                 forKey && (attribs[`${aimPerfix}key`] = aimConfig.directiveBrackets(forKey));
             }
-            delete attribs[item];
         }
     }
     return ast;
