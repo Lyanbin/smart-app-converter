@@ -18,12 +18,11 @@ module.exports = function converJson(dir, aimType) {
 
 function handleJson(aimType) {
     // 这里可以针对不同的aimType做处理
-    // const aimFileType = config[aimType].style;
+    const aimFileType = config[aimType].style;
     return async function (filePath) {
+        let content = fs.readFileSync(filePath).toString();
+        // 如果是less的话，处理下
         if (path.extname(filePath) === '.less') {
-
-            // 对style处理
-            let content = fs.readFileSync(filePath).toString();
             let lessRes = '';
             try {
                 lessRes = await less.render(content, {
@@ -36,10 +35,17 @@ function handleJson(aimType) {
                 console.log(`${filePath} build failed...`);
                 console.log(e);
             }
-            let css = lessRes ? lessRes.css : '';
-            let cssPath = filePath.replace(/.less$/, '.css');
-            await fs.ensureFile(cssPath);
-            fs.writeFile(cssPath, css);
+            content = lessRes ? lessRes.css : content;
         }
+        content = content.replace(/\.(?:wxss|css|acss)/ig, `.${aimFileType}`);
+        console.log('======');
+        console.log(filePath);
+        console.log(content.match(/\.(?:wxss|css|acss)/ig));
+        console.log(`.${aimFileType}`);
+        console.log('&&&&&&');
+
+        let cssPath = filePath.replace(/.less$/, `.${aimFileType}`);
+        await fs.ensureFile(cssPath);
+        fs.writeFile(cssPath, content);
     };
 }

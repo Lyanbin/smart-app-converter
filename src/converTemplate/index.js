@@ -75,7 +75,7 @@ function traverseTemplAst(ast, aimConfig) {
     if (/^(?:template)$/.test(name)) { // 百度小程序tm的data扩展需要三个花括号
         // 没想好这里怎么写
         // TODO
-        
+        // ast.name = 'view';
     }
     // 后续有问题的组件，都写在这里
     if (/^(?:rich-text)$/.test(name)) {
