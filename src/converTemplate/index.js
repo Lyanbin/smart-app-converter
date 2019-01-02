@@ -37,21 +37,18 @@ function handleTempl(aimType) {
             contentStr = contentStr.replace(/\<\!--(weixin|baidu|zhifubao) begin--\>[\s\S]*?\<\!--\1 end--\>/g, '');
             // 包一层做适配
             let content = `<ast-wraper>${contentStr}</ast-wraper>`;
-            // TODO 这里if做例子，后续删除
-            if (/search.wxml/.test(filePath)) {
-                const DomHandler = new htmlparser.DomHandler();
-                const Parser = new htmlparser.Parser(DomHandler, {
-                    xmlMode: false,
-                    lowerCaseAttributeNames: false,
-                    recognizeSelfClosing: true,
-                    lowerCaseTags: false
-                });
-                Parser.end(content);
-                let ast = DomHandler.dom;
-                let newAst = traverseTemplAst(ast, config[aimType]);
-                let newContent = returnHtmlFromAst(newAst);
-                fs.writeFile(filePath, newContent);
-            }
+            const DomHandler = new htmlparser.DomHandler();
+            const Parser = new htmlparser.Parser(DomHandler, {
+                xmlMode: false,
+                lowerCaseAttributeNames: false,
+                recognizeSelfClosing: true,
+                lowerCaseTags: false
+            });
+            Parser.end(content);
+            let ast = DomHandler.dom;
+            let newAst = traverseTemplAst(ast, config[aimType]);
+            let newContent = returnHtmlFromAst(newAst);
+            fs.writeFile(filePath, newContent);
         }
     };
 }
