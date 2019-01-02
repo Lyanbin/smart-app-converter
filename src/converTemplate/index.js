@@ -73,9 +73,7 @@ function traverseTemplAst(ast, aimConfig) {
         ast.name = 'view';
     }
     if (/^(?:template)$/.test(name)) { // 百度小程序tm的data扩展需要三个花括号
-        // 没想好这里怎么写
-        // TODO
-        // ast.name = 'view';
+        ast = mapTemplate(ast, aimConfig.templateData);
     }
     // 后续有问题的组件，都写在这里
     if (/^(?:rich-text)$/.test(name)) {
@@ -122,6 +120,18 @@ function mapImport(ast, aimTempl) {
     return ast;
 }
 
+function mapTemplate(ast, aimTemplateData) {
+    let data = ast.attribs.data;
+    if (data) {
+        // 扒掉括号
+        while (/{.*}/.test(data)) {
+            data = data.match(/{(.*)}/)[1];
+        }
+        ast.attribs.data = aimTemplateData(data);
+    }
+    return ast;
+}
+
 function mapEvent(ast, aimEvent) {
     let attribs = ast.attribs;
     let reg = /(?:bind|catch|on):?(\w+)/;
@@ -142,7 +152,7 @@ function mapDirection(ast, aimConfig) {
     let aimPerfix = aimConfig.directivePerfix;
     let reg = /(wx:|a:|s-)(elif|else-if|if|else|for|for-index|for-item|key)/;
     let bracketsReg = /{{([^{]+)}}/;
-    let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackby\s+(\S+))?\s*$/;
+    let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackBy\s+(\S+))?\s*$/;
     for (let item in attribs) {
         // 括号扒掉
         attribs[item] = attribs[item].replace(bracketsReg, '$1');
