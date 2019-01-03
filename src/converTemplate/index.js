@@ -134,7 +134,7 @@ function mapTemplate(ast, aimTemplateData) {
 
 function mapEvent(ast, aimEvent) {
     let attribs = ast.attribs;
-    let reg = /(?:bind|catch|on):?(\w+)/;
+    let reg = /^(?:bind|catch|on):?(\w+)$/;
     for (let item in attribs) {
         if (reg.test(item)) {
             let eventName = item.match(reg)[1];
@@ -152,7 +152,7 @@ function mapDirection(ast, aimConfig) {
     let aimPerfix = aimConfig.directivePerfix;
     let reg = /(wx:|a:|s-)(elif|else-if|if|else|for|for-index|for-item|key)/;
     let bracketsReg = /{{([^{]+)}}/;
-    let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(\s+trackBy\s+(\S+))?\s*$/;
+    let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(?:\s+trackBy\s+(\S+))?\s*$/;
     for (let item in attribs) {
         if (reg.test(item)) {
             // 括号扒掉
