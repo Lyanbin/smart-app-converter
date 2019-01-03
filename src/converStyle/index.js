@@ -39,11 +39,10 @@ function handleJson(aimType) {
                 content = lessRes ? lessRes.css : content;
             }
             content = content.replace(/\.(?:wxss|css|acss)/ig, `.${aimFileType}`);
-    
             let cssPath = filePath.replace(/.less$/, `.${aimFileType}`);
-            await fs.remove(filePath);
-            await fs.ensureFile(cssPath);
-            await fs.writeFile(cssPath, content);
+            fs.removeSync(filePath);
+            fs.ensureFileSync(cssPath);
+            fs.writeFileSync(cssPath, content);
         }
     };
 }
