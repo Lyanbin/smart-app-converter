@@ -43,7 +43,7 @@ function handleJson(aimType) {
             let cssPath = filePath.replace(/.less$/, `.${aimFileType}`);
             await fs.remove(filePath);
             await fs.ensureFile(cssPath);
-            fs.writeFile(cssPath, content);
+            await fs.writeFile(cssPath, content);
         }
     };
 }

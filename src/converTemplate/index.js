@@ -48,7 +48,7 @@ function handleTempl(aimType) {
             let ast = DomHandler.dom;
             let newAst = traverseTemplAst(ast, config[aimType]);
             let newContent = returnHtmlFromAst(newAst);
-            fs.writeFile(filePath, newContent);
+            await fs.writeFile(filePath, newContent);
         }
     };
 }

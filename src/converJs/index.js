@@ -63,7 +63,7 @@ function handleJs(aimType) {
                 }
             });
             let newCode = generator(ast, {});
-            fs.writeFile(filePath, newCode.code);
+            await fs.writeFile(filePath, newCode.code);
         }
     };
 }

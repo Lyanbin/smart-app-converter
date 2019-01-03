@@ -1,5 +1,10 @@
 # smart app converter
-
+## 使用方式
+```
+git clone
+npm link
+killswan -w ./
+```
 ## 使用前提
 - 对于```template```的传参，请使用扩展符```{{...data}}```
 - 一切模板到```js```的内容，请使用```{{}}```包裹，不管当前有没有报错，都要这么处理，不然会gg
