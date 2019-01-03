@@ -124,8 +124,8 @@ function mapTemplate(ast, aimTemplateData) {
     let data = ast.attribs.data;
     if (data) {
         // 扒掉括号
-        while (/{.*}/.test(data)) {
-            data = data.match(/{(.*)}/)[1];
+        while (/{((?:.|\s)*)}/gm.test(data)) {
+            data = data.match(/{((?:.|\s)*)}/)[1];
         }
         ast.attribs.data = aimTemplateData(data);
     }
