@@ -172,9 +172,9 @@ function mapDirection(ast, aimConfig) {
                 let forItem = regRes[1];
                 let forKey = regRes[4];
                 attribs[`${aimPerfix}for`] = aimConfig.directiveBrackets(forArr);
-                forIndex && forIndex !== 'index' && (attribs[`${aimPerfix}for-index`] = aimConfig.directiveBrackets(forIndex));
-                forItem && forItem !== 'item' && (attribs[`${aimPerfix}for-item`] = aimConfig.directiveBrackets(forItem));
-                forKey && (attribs[`${aimPerfix}key`] = aimConfig.directiveBrackets(forKey));
+                forIndex && forIndex !== 'index' && (attribs[`${aimPerfix}for-index`] = forIndex);
+                forItem && forItem !== 'item' && (attribs[`${aimPerfix}for-item`] = forItem);
+                forKey && (attribs[`${aimPerfix}key`] = forKey);
             }
         }
     }
