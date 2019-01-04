@@ -14,11 +14,11 @@ module.exports = function converJson(dir, aimType) {
         return false;
     }
     console.log('Convering the style files...');
-    util.recursiveReadDir(dir, handleJson(aimType, dir));
+    util.recursiveReadDir(dir, handleStyle(aimType, dir));
 };
 
 
-function handleJson(aimType, dir) {
+function handleStyle(aimType, dir) {
     // 这里可以针对不同的aimType做处理
     const aimFileType = config[aimType].style;
     return async function (filePath) {
@@ -43,7 +43,7 @@ function handleJson(aimType, dir) {
             // content = content.replace(/\.(?:wxss|css|acss)/ig, `.${aimFileType}`);
 
             let astObj = postcss.parse(content);
-            let newAstObj = await handleCssAst(astObj ,aimFileType, filePath, dir);
+            let newAstObj = await handleCssAst(astObj, aimFileType, filePath, dir);
             let resContent = '';
             postcss.stringify(newAstObj, (str) => {
                 resContent += str;
