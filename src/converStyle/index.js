@@ -67,6 +67,7 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
             await Promise.all(item.nodes.map(async (declNode) => {
                 if (/^background(?:-image)?$/.test(declNode.prop) && /url\((['"]?)([^'"]*?)\1\)/.test(declNode.value)) {
                     let originValue = declNode.value;
+                    // TODO：background-image可以写多个url
                     let imagePath = originValue.match(/url\((['"]?)([^'"]*?)\1\)/)[2];
                     let isNetSource = /^((?:http|https):)?\/\//.test(imagePath.trim());
                     if (!isNetSource) {
