@@ -65,26 +65,24 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
             item.params = item.params.replace(/\.(?:wxss|css|acss)/ig, `.${aimFileType}`);
         } else if (item.type === 'rule') {
             await Promise.all(item.nodes.map(async (declNode) => {
-                if (/^background(?:-image)?$/.test(declNode.prop) && /url\((['"]?)([^'"]*?)\1\)/.test(declNode.value)) {
-                    let originValue = declNode.value;
-                    // TODO：background-image可以写多个url
-                    let imagePath = originValue.match(/url\((['"]?)([^'"]*?)\1\)/)[2];
-                    let isNetSource = /^((?:http|https):)?\/\//.test(imagePath.trim());
-                    if (!isNetSource) {
-                        // 这里要base64
+                if (/^background(?:-image)?$/.test(declNode.prop)) {
+                    let isSourceReg = /url\((['"]?)((?!(data:|https?:|\/\/)).*?)\1\)/;
+                    let imagePath = declNode.value.match(isSourceReg) ? declNode.value.match(isSourceReg)[2] : null;
+                    while (imagePath) {
                         let truePath = path.resolve(path.dirname(filePath), imagePath);
                         if (/^\//.test(imagePath)) {
                             truePath = path.resolve(`${dir}${imagePath}`);
                         }
                         let base64 = await resolver.data(truePath);
-                        declNode.value = `url(${base64})`;
-                        return declNode;
+                        declNode.value = declNode.value.replace(isSourceReg, `url(${base64})`);
+                        imagePath = declNode.value.match(isSourceReg) ? declNode.value.match(isSourceReg)[2] : null;
                     }
+                    return declNode;
                 }
             }));
             // 微信小程序里不支持通配符，百度的支持，这里给通配符统一转换下，可能有问题，避免使用
             if (item.selector === '*') {
-                item.selector = 'view, scroll-view, swiper, movable-area, cover-view, cover-image, icon, text, rich-text, progress, animation-view, button, checkbox, form, input, label, picker, radio, slider, switch, textarea, navigator, audio, image, video, camera, live-player, map, canvas';
+                item.selector = 'block, view, scroll-view, swiper, movable-area, cover-view, cover-image, icon, text, rich-text, progress, animation-view, button, checkbox, form, input, label, picker, radio, slider, switch, textarea, navigator, audio, image, video, camera, live-player, map, canvas';
             }
         }
         return item;
