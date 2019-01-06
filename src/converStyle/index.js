@@ -82,6 +82,10 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
                     }
                 }
             }));
+            // 微信小程序里不支持通配符，百度的支持，这里给通配符统一转换下，可能有问题，避免使用
+            if (item.selector === '*') {
+                item.selector = 'view, scroll-view, swiper, movable-area, cover-view, cover-image, icon, text, rich-text, progress, animation-view, button, checkbox, form, input, label, picker, radio, slider, switch, textarea, navigator, audio, image, video, camera, live-player, map, canvas';
+            }
         }
         return item;
     }));
