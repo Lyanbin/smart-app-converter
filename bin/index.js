@@ -14,7 +14,7 @@ program.parse(process.argv);
 if (program.weixin) {
     parseParam(program.weixin, 'weixin');
 } else if (program.baidu) {
-    console.log(`${chalk.red('not support baidu now.')}`);
+    parseParam(program.baidu, 'baidu');
 } else if (program.zhifubao) {
     console.log(`${chalk.red('not support zhifubao now.')}`);
 }

@@ -71,8 +71,10 @@ function traverseTemplAst(ast, aimConfig) {
     }
     if (/^(?:ad|track-log)$/.test(name) && aimConfig.type !== 'baidu') { // 广告和统计是百度私有的
         ast.name = 'view';
+        ast.attribs = {};
+        ast.children = [];
     }
-    if (/^(?:template)$/.test(name)) { // 百度小程序tm的data扩展需要三个花括号
+    if (/^(?:template)$/.test(name)) { // 百度小程序data扩展需要三个花括号
         ast = mapTemplate(ast, aimConfig.templateData);
     }
     // 后续有问题的组件，都写在这里
@@ -96,13 +98,17 @@ function traverseTemplAst(ast, aimConfig) {
     ast = mapEvent(ast, aimConfig.event);
     // 指令转换
     ast = mapDirection(ast, aimConfig);
-
-    if (false) { // TODO自定义组件的一些处理
+    // TODO自定义组件的一些处理，这里各家小程序gap比较大，没想好
+    if (false) {
 
     }
     if (children && children.length) {
         traverseTemplAst(ast.children, aimConfig);
     }
+
+    // 条件和循环同时出现了，要处理下，放在处理children之后处理，避免重复循环
+    ast = handleIfWithFor(ast);
+
     return ast;
 }
 
@@ -177,6 +183,39 @@ function mapDirection(ast, aimConfig) {
                 forKey && (attribs[`${aimPerfix}key`] = forKey);
             }
         }
+    }
+    return ast;
+}
+
+function handleIfWithFor(ast) {
+    let {
+        attribs,
+        parent
+    } = ast;
+    let ifReg = /(wx:|a:|s-)(elif|else-if|if|else)/;
+    let forReg = /(wx:|a:|s-)(for)/;
+    let ifItmeName = '';
+    let forItmeName = '';
+    for (let item in attribs) {
+        if (ifReg.test(item)) {
+            ifItmeName = item;
+        }
+        if (forReg.test(item)) {
+            forItmeName = item;
+        }
+    }
+    if (ifItmeName && forItmeName) {
+        let vNode = {
+            type: 'tag',
+            name: 'block',
+            attribs: {},
+            children: [ast],
+            parent
+        }
+        vNode.attribs[ifItmeName] = attribs[ifItmeName];
+        delete ast.attribs[ifItmeName];
+        ast.parent.children = [vNode];
+        return vNode;
     }
     return ast;
 }
