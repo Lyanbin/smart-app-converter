@@ -112,7 +112,7 @@ function traverseTemplAst(ast, aimConfig, filePath) {
     }
 
     // 条件和循环同时出现了，要处理下，放在处理children之后处理，避免重复循环
-    ast = handleIfWithFor(ast);
+    ast = handleIfWithFor(ast, filePath);
 
     return ast;
 }
@@ -161,7 +161,7 @@ function mapEvent(ast, aimEvent) {
 function mapDirection(ast, aimConfig) {
     let attribs = ast.attribs;
     let aimPerfix = aimConfig.directivePerfix;
-    let reg = /(wx:|a:|s-)(elif|else-if|if|else|for|for-index|for-item|key)/;
+    let reg = /^\s*(wx:|a:|s-)(elif|else-if|if|else|for-index|for-item|for|key)\s*$/;
     let bracketsReg = /{{([^{]+)}}/;
     let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(?:\s+trackBy\s+(\S+))?\s*$/;
     for (let item in attribs) {
@@ -192,24 +192,26 @@ function mapDirection(ast, aimConfig) {
     return ast;
 }
 
-function handleIfWithFor(ast) {
+function handleIfWithFor(ast, filePath) {
     let {
         attribs,
         parent
     } = ast;
-    let ifReg = /(wx:|a:|s-)(elif|else-if|if|else)/;
-    let forReg = /(wx:|a:|s-)(for)/;
+    let ifReg = /^\s*(wx:|a:|s-)(elif|else-if|if|else)\s*$/;
+    let forReg = /^\s*(wx:|a:|s-)(for)\s*$/;
+    let baiduForReg = /^\s*(\w+)(?:\s*,\s*(\w+))?\s+in\s+(\S+)(?:\s+trackBy\s+(\S+))?\s*$/;
     let ifItmeName = '';
     let forItmeName = '';
     for (let item in attribs) {
         if (ifReg.test(item)) {
             ifItmeName = item;
         }
-        if (forReg.test(item)) {
+        if (forReg.test(item) || baiduForReg.test(item)) {
             forItmeName = item;
         }
     }
     if (ifItmeName && forItmeName) {
+        util.warning(`${filePath} \n Conditional '${ifItmeName}=${attribs[ifItmeName]}' is hoisted to the outer of loop '${forItmeName}=${attribs[forItmeName]}'.`);
         let vNode = {
             type: 'tag',
             name: 'block',
