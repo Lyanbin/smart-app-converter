@@ -70,8 +70,11 @@ function traverseTemplAst(ast, aimConfig, filePath) {
         ast = mapImport(ast, aimConfig.templ);
     }
     if (/^(?:ad|track-log)$/.test(name) && aimConfig.type !== 'baidu') { // 广告和统计是百度私有的
+        let classes = attribs.class || '';
         ast.name = 'view';
-        ast.attribs = {};
+        ast.attribs = {
+            class: classes
+        };
     }
     if (/^(?:template)$/.test(name)) { // 百度小程序data扩展需要三个花括号，如果template上有class，给出警告
         ast = mapTemplate(ast, aimConfig.templateData);
