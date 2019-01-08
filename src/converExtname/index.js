@@ -7,10 +7,10 @@ const config = require('../config.js');
 const util = require('../util.js');
 module.exports = async function converExtname(dir, aimType) {
     if (!aimType) {
-        console.log('No aim type, do nothing...');
+        util.error('No aim type, do nothing...');
         return false;
     }
-    console.log('Convering the extnames...');
+    util.log('Convering the extnames...');
     util.recursiveReadDir(dir, changeExtname(aimType));
 };
 

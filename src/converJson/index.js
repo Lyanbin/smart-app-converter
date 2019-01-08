@@ -6,10 +6,10 @@ const util = require('../util.js');
 
 module.exports = function converJson(dir, aimType) {
     if (!aimType) {
-        console.log('No aim type, do nothing...');
+        util.error('No aim type, do nothing...');
         return false;
     }
-    console.log('Convering the json files...');
+    util.log('Convering the json files...');
     util.recursiveReadDir(dir, handleJson(aimType));
 };
 
@@ -21,7 +21,7 @@ function handleJson(aimType) {
             // 对json处理
             // TODO
             // 可以替换appid、appkey之类的
-            // console.log(filePath);
+            // util.log(filePath);
         }
     };
 }

@@ -13,12 +13,12 @@ const twoWayBindTag = {
     'movable-view': ['x', 'y'],
     'slider': ['value']
 };
-module.exports = function converJson(dir, aimType) {
+module.exports = function converTempl(dir, aimType) {
     if (!aimType) {
-        console.log('No aim type, do nothing...');
+        util.error('No aim type, do nothing...');
         return false;
     }
-    console.log('Convering the templ files...');
+    util.log('Convering the templ files...');
     util.recursiveReadDir(dir, handleTempl(aimType));
 };
 
@@ -46,18 +46,18 @@ function handleTempl(aimType) {
             });
             Parser.end(content);
             let ast = DomHandler.dom;
-            let newAst = traverseTemplAst(ast, config[aimType]);
+            let newAst = traverseTemplAst(ast, config[aimType], filePath);
             let newContent = returnHtmlFromAst(newAst);
             await fs.writeFile(filePath, newContent);
         }
     };
 }
 
-function traverseTemplAst(ast, aimConfig) {
+function traverseTemplAst(ast, aimConfig, filePath) {
     // 数组继续递归
     if (Array.isArray(ast)) {
         ast.map(item => {
-            return traverseTemplAst(item, aimConfig);
+            return traverseTemplAst(item, aimConfig, filePath);
         });
     }
     // 非数组进行判断
@@ -74,15 +74,18 @@ function traverseTemplAst(ast, aimConfig) {
         ast.attribs = {};
         ast.children = [];
     }
-    if (/^(?:template)$/.test(name)) { // 百度小程序data扩展需要三个花括号
+    if (/^(?:template)$/.test(name)) { // 百度小程序data扩展需要三个花括号，如果template上有class，给出警告
         ast = mapTemplate(ast, aimConfig.templateData);
+        if (attribs.class) {
+            util.warning(`${filePath} \n Template should not have class ${attribs.class}.`);
+        }
     }
     // 后续有问题的组件，都写在这里
     if (/^(?:rich-text)$/.test(name)) {
         let tag = name.match(/^(rich-text)$/)[1];
         ast.name = aimConfig.tag[tag] ? name : 'view';
         if (!aimConfig.tag[tag]) {
-            console.log(`${tag} is not supported for your aim app...`);
+            util.warning(`${filePath} \n ${tag} is not supported for your aim app.`);
         }
     }
     if (twoWayBindTag[name]) { // 这些标签需要处理双向绑定的问题
@@ -103,7 +106,7 @@ function traverseTemplAst(ast, aimConfig) {
 
     }
     if (children && children.length) {
-        traverseTemplAst(ast.children, aimConfig);
+        traverseTemplAst(ast.children, aimConfig, filePath);
     }
 
     // 条件和循环同时出现了，要处理下，放在处理children之后处理，避免重复循环

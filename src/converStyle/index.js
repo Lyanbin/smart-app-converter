@@ -8,12 +8,12 @@ const config = require('../config.js');
 const less = require('less');
 const postcss = require('postcss');
 const Assets = require('assets');
-module.exports = function converJson(dir, aimType) {
+module.exports = function converStyle(dir, aimType) {
     if (!aimType) {
-        console.log('No aim type, do nothing...');
+        util.error('No aim type, do nothing...');
         return false;
     }
-    console.log('Convering the style files...');
+    util.log('Convering the style files...');
     util.recursiveReadDir(dir, handleStyle(aimType, dir));
 };
 
@@ -35,8 +35,8 @@ function handleStyle(aimType, dir) {
                         ]
                     });
                 } catch (e) {
-                    console.log(`${filePath} build failed...`);
-                    console.log(e);
+                    util.error(`${filePath} \n build to css failed...`);
+                    util.error(e);
                 }
                 content = lessRes ? lessRes.css : content;
             }

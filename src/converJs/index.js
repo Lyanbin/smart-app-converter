@@ -12,10 +12,10 @@ const generator = require('@babel/generator').default;
 const T = require('@babel/types');
 module.exports = function converJs(dir, aimType) {
     if (!aimType) {
-        console.log('No aim type, do nothing...');
+        util.error('No aim type, do nothing...');
         return false;
     }
-    console.log('Convering the js files...');
+    util.log('Convering the js files...');
     util.recursiveReadDir(dir, handleJs(aimType));
 };
 

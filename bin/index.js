@@ -4,6 +4,7 @@ const program = require('commander');
 const chalk = require('chalk');
 const path = require('path');
 const converApp = require('../src/index.js');
+const util = require('../src/util.js');
 program.version(packageJson.version)
     .option('-w --weixin <entryDir> [outputDir]', 'Get weixin mini program')
     .option('-z --zhifubao <entryDir> [outputDir]', 'Get zhifubao mini program')
@@ -16,12 +17,12 @@ if (program.weixin) {
 } else if (program.baidu) {
     parseParam(program.baidu, 'baidu');
 } else if (program.zhifubao) {
-    console.log(`${chalk.red('not support zhifubao now.')}`);
+    util.log(`${chalk.red('not support zhifubao now.')}`);
 }
 
 function parseParam(entryDir, aim) {
     if (!aim) {
-        console.log(`${chalk.red('what do u want?')}`);
+        util.error(`${chalk.red('what do u want?')}`);
         return;
     }
     let resolvedEntryDir = path.resolve(entryDir);

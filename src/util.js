@@ -3,6 +3,7 @@
  */
 const fs = require('fs-extra');
 const path = require('path');
+const chalk = require('chalk');
 
 module.exports.recursiveReadDir = function (dir, cb) {
     let dirs = fs.readdirSync(dir);
@@ -18,4 +19,20 @@ module.exports.recursiveReadDir = function (dir, cb) {
             cb(resolvedPath);
         }
     });
+}
+
+module.exports.warning = function (context) {
+    console.log(chalk.yellow(`[warning]: ${context}`));
+}
+
+module.exports.error = function (context) {
+    console.log(chalk.red(`[error]: ${context}`));
+}
+
+module.exports.log = function(context) {
+    console.log(`[log]: ${context}`);
+}
+
+module.exports.success = function (context) {
+    console.log(chalk.green(`[success]: ${context}`));
 }
