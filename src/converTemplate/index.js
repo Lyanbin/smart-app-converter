@@ -141,12 +141,16 @@ function mapTemplate(ast, aimTemplateData) {
 
 function mapEvent(ast, aimEvent) {
     let attribs = ast.attribs;
-    let reg = /^(?:bind|catch|on):?(\w+)$/;
+    let reg = /^(bind|catch|on):?(\w+)$/;
     for (let item in attribs) {
         if (reg.test(item)) {
-            let eventName = item.match(reg)[1];
+            let eventPrefix = item.match(reg)[1];
+            let eventName = item.match(reg)[2];
             let event = attribs[item];
-            let newEventName = aimEvent && aimEvent(eventName);
+            if (event === 'clickVideo') {
+                console.log(eventName);
+            }
+            let newEventName = aimEvent && aimEvent(eventName, eventPrefix);
             delete attribs[item];
             attribs[newEventName] = event;
         }

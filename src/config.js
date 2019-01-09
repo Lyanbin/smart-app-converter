@@ -12,7 +12,12 @@ module.exports = {
         class: 'swan',
         api: {},
         twoWayBind: data => `{= ${data} =}`,
-        event: eventName => `bind${eventName}`,
+        event: (eventName, eventPerf) => {
+            if (eventPerf === 'on') {
+                eventPerf = 'bind';
+            }
+            return `${eventPerf}${eventName}`;
+        },
         directivePerfix: 's-',
         directiveBrackets: data => data,
         directiveIf: {
@@ -33,7 +38,12 @@ module.exports = {
         api: {},
         twoWayBind: data => `{{ ${data} }}`,
         directiveBrackets: data => data ? `{{ ${data} }}` : '',
-        event: eventName => `bind${eventName}`,
+        event: (eventName, eventPerf) => {
+            if (eventPerf === 'on') {
+                eventPerf = 'bind';
+            }
+            return `${eventPerf}${eventName}`;
+        },
         directivePerfix: 'wx:',
         directiveIf: {
             elseif: 'elif'
@@ -53,9 +63,12 @@ module.exports = {
         api: {},
         twoWayBind: data => `{{ ${data} }}`,
         directiveBrackets: data => data ? `{{ ${data} }}` : '',
-        event: eventName => {
+        event: (eventName, eventPerf) => {
             eventName = eventName.trim().replace(/^[a-z]/g, (L) => L.toUpperCase());
-            return `on${eventName}`;
+            if (eventPerf !== 'catch') {
+                eventPerf = 'on';
+            }
+            return `${eventPerf}${eventName}`;
         },
         directivePerfix: 'a:',
         directiveIf: {
