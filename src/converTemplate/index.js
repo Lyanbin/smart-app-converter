@@ -147,9 +147,6 @@ function mapEvent(ast, aimEvent) {
             let eventPrefix = item.match(reg)[1];
             let eventName = item.match(reg)[2];
             let event = attribs[item];
-            if (event === 'clickVideo') {
-                console.log(eventName);
-            }
             let newEventName = aimEvent && aimEvent(eventName, eventPrefix);
             delete attribs[item];
             attribs[newEventName] = event;
