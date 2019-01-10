@@ -60,6 +60,28 @@ function handleJs(aimType) {
                             nodeTemp.name = aimClassType;
                         }
                     }
+                },
+                // 对globalData填充，塞进去一个当前的type
+                ExpressionStatement(path) {
+                    if (T.isCallExpression(path.node.expression) && T.isIdentifier(path.node.expression.callee) && path.node.expression.callee.name === 'App') {
+                        let expressionPath = path.get('expression');
+                        let paramsArrPath = expressionPath.get('arguments');
+                        
+                        // 一般只有1个参数，礼貌性循环一次
+                        paramsArrPath.map(itemPath => {
+                            if (T.isObjectExpression(itemPath)) {
+                                let argPropertiesPath = itemPath.get('properties');
+                                argPropertiesPath.map(argPropertyPath => {
+                                    if (T.isObjectProperty(argPropertyPath) && T.isIdentifier(argPropertyPath.node.key) && argPropertyPath.node.key.name === 'globalData') {
+                                        let vNode = T.objectProperty(T.identifier('__type__'), T.StringLiteral(aimType));
+                                        argPropertyPath.get('value').pushContainer('properties', vNode);
+                                    }
+                                    return argPropertiesPath;
+                                });
+                                return itemPath;
+                            }
+                        });
+                    }
                 }
             });
             let newCode = generator(ast, {});

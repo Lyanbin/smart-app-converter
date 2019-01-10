@@ -16,7 +16,7 @@ if (program.weixin) {
 } else if (program.baidu) {
     parseParam(program.baidu, 'baidu');
 } else if (program.zhifubao) {
-    util.error('not support zhifubao now.');
+    parseParam(program.zhifubao, 'zhifubao');
 }
 
 function parseParam(entryDir, aim) {
