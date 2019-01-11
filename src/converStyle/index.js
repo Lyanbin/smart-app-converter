@@ -66,7 +66,7 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
         } else if (item.type === 'rule') {
             await Promise.all(item.nodes.map(async (declNode) => {
                 if (/^background(?:-image)?$/.test(declNode.prop)) {
-                    let isSourceReg = /url\((['"]?)((?!(data:|https?:|\/\/)).*?)\1\)/;
+                    let isSourceReg = /url\((['"]?)((?!(data:|https?:|'|"|\/\/)).*?)\1\)/;
                     let imagePath = declNode.value.match(isSourceReg) ? declNode.value.match(isSourceReg)[2] : null;
                     while (imagePath) {
                         let truePath = path.resolve(path.dirname(filePath), imagePath);
