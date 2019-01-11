@@ -13,6 +13,7 @@ const twoWayBindTag = {
     'movable-view': ['x', 'y'],
     'slider': ['value']
 };
+const selfCloseTag = ['import', 'include', 'input'];
 module.exports = function converTempl(dir, aimType) {
     if (!aimType) {
         util.error('No aim type, do nothing...');
@@ -94,6 +95,9 @@ function traverseTemplAst(ast, aimConfig, filePath) {
                 ast.attribs[attrKey] = aimConfig.twoWayBind && aimConfig.twoWayBind(attrValue.match(/{[{=](.+)[}=]}/)[1]);
             }
         });
+    }
+    if (~selfCloseTag.indexOf(name)) {
+        ast.selfClose = true;
     }
     // 事件每家小程序都不太一样，要转换下
     ast = mapEvent(ast, aimConfig.event);
@@ -263,16 +267,15 @@ function astNodeToString(astNode, content) {
     let {
         name,
         attribs,
-        singleQuoteAttribs = {},
         selfClose
     } = astNode;
-    let attrStr = attrsToString(attribs, singleQuoteAttribs);
+    let attrStr = attrsToString(attribs);
     let tempStr = `${name} ${attrStr}`;
     return selfClose && !content ? `<${tempStr} />` : `<${tempStr}>${content}</${name}>`;
 }
 
 
-function attrsToString(attrs = {}, singleQuoteAttribs) {
+function attrsToString(attrs = {}) {
     let resArr = [];
     for (let item in attrs) {
         let value = attrs[item];
