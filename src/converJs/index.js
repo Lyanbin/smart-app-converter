@@ -16,7 +16,7 @@ module.exports = function converJs(dir, aimType) {
         return false;
     }
     util.log('Convering the js files...');
-    util.recursiveReadDir(dir, handleJs(aimType));
+    util.recursiveReadAllFile(dir, handleJs(aimType));
 };
 
 

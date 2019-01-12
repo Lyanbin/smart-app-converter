@@ -4,18 +4,19 @@
 const path = require('path');
 const util = require('../util.js');
 
-module.exports = function converJson(dir, aimType) {
+module.exports = function converJson(dir, aimType, config) {
     if (!aimType) {
         util.error('No aim type, do nothing...');
         return false;
     }
     util.log('Convering the json files...');
-    util.recursiveReadDir(dir, handleJson(aimType));
+    util.recursiveReadAllFile(dir, handleJson(aimType, config));
 };
 
 
-function handleJson(aimType) {
+function handleJson(aimType, config) {
     // 这里可以针对不同的aimType做处理
+    const aimConfig = config[aimType];
     return function (filePath) {
         if (path.extname(filePath) === '.json') {
             // 对json处理

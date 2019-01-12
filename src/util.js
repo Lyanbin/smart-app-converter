@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
 
-module.exports.recursiveReadDir = function (dir, cb) {
+module.exports.recursiveReadAllFile = function (dir, cb) {
     let dirs = fs.readdirSync(dir);
     dirs.forEach((item) => {
         if (/(?:DS_Store|git|vscode)$/.test(item)) {
@@ -14,7 +14,7 @@ module.exports.recursiveReadDir = function (dir, cb) {
         let resolvedPath = path.join(dir, item);
         let itemStat = fs.statSync(resolvedPath);
         if (itemStat.isDirectory()) {
-            module.exports.recursiveReadDir(resolvedPath, cb);
+            module.exports.recursiveReadAllFile(resolvedPath, cb);
         } else {
             cb(resolvedPath);
         }

@@ -4,6 +4,7 @@ const program = require('commander');
 const path = require('path');
 const converApp = require('../src/index.js');
 const util = require('../src/util.js');
+const fs = require('fs-extra');
 program.version(packageJson.version)
     .option('-w --weixin <entryDir> [outputDir]', 'Get weixin mini program')
     .option('-z --zhifubao <entryDir> [outputDir]', 'Get zhifubao mini program')
@@ -11,6 +12,7 @@ program.version(packageJson.version)
     .usage('<command> <entryDir> [outputDir]');
 
 program.parse(process.argv);
+
 if (program.weixin) {
     parseParam(program.weixin, 'weixin');
 } else if (program.baidu) {
@@ -25,6 +27,12 @@ function parseParam(entryDir, aim) {
         return;
     }
     let resolvedEntryDir = path.resolve(entryDir);
+
+    let entryDirCheckFile = path.resolve(entryDir, 'app.json');
+    if (!fs.pathExistsSync(entryDirCheckFile) || !fs.statSync(entryDirCheckFile).isFile()) {
+        util.error('Illegal enterDir.');
+        return;
+    }
     let resolvedOutDir = program.args[0] ? path.resolve(program.args[0]) : null;
     converApp(resolvedEntryDir, resolvedOutDir, aim);
 }

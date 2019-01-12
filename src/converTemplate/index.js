@@ -20,7 +20,7 @@ module.exports = function converTempl(dir, aimType) {
         return false;
     }
     util.log('Convering the templ files...');
-    util.recursiveReadDir(dir, handleTempl(aimType));
+    util.recursiveReadAllFile(dir, handleTempl(aimType));
 };
 
 

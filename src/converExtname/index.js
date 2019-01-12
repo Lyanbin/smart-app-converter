@@ -11,7 +11,7 @@ module.exports = async function converExtname(dir, aimType) {
         return false;
     }
     util.log('Convering the extnames...');
-    util.recursiveReadDir(dir, changeExtname(aimType));
+    util.recursiveReadAllFile(dir, changeExtname(aimType));
 };
 
 function changeExtname(aimType) {

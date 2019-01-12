@@ -14,7 +14,7 @@ module.exports = function converStyle(dir, aimType) {
         return false;
     }
     util.log('Convering the style files...');
-    util.recursiveReadDir(dir, handleStyle(aimType, dir));
+    util.recursiveReadAllFile(dir, handleStyle(aimType, dir));
 };
 
 
@@ -73,7 +73,7 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
                         if (/^\//.test(imagePath)) {
                             truePath = path.resolve(`${dir}${imagePath}`);
                         }
-                        let pathExists = await fs.pathExists(truePath);
+                        let pathExists = fs.pathExistsSync(truePath);
                         if (pathExists) {
                             let base64 = await resolver.data(truePath);
                             declNode.value = declNode.value.replace(isSourceReg, `url(${base64})`);
@@ -81,8 +81,7 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
     
                         } else {
                             util.error(`${filePath} \n ${imagePath} is not a legal path.`);
-                            declNode.value = '';
-                            imagePath = '';
+                            break;
                         }
                     }
                     return declNode;

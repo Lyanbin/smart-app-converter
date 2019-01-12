@@ -24,7 +24,7 @@ module.exports = {
             elseif: 'else-if'
         },
         tag: {
-            'richText': true
+            'rich-text': true
         },
         templateData: data => `{{{ ${data} }}}`
     },
