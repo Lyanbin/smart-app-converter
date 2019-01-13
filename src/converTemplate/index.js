@@ -81,8 +81,7 @@ function traverseTemplAst(ast, aimConfig, filePath) {
     }
     // 后续有问题的组件，都写在这里
     if (/^(?:rich-text)$/.test(name)) {
-        let tag = name.match(/^(rich-text)$/)[1];
-        ast.name = aimConfig.tag[tag] ? name : 'view';
+        ast.name = aimConfig.tag[name] ? name : 'view';
         if (!aimConfig.tag[tag]) {
             util.warning(`${filePath} \n ${tag} is not supported for your aim app.`);
         }
