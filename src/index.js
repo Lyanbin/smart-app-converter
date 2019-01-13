@@ -35,7 +35,7 @@ module.exports = async function converApp(entryDir, outDir, aimType) {
         try {
             let aimConfigObj = appConfig[aimType] || {};
             // 这些页面是我需要的
-            let needPaths = aimConfigObj.path;
+            let needPaths = aimConfigObj.pages;
             // 如果配置了则生效，没配置就不生效了
             if (needPaths && needPaths.length > 0) {
                 let outPagePath = path.resolve(outDir, 'pages');
