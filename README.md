@@ -3,7 +3,7 @@
 ```
 git clone
 npm link
-killswan -w ./
+killswan -w <srcPath> [outputPath]
 ```
 ## 使用前提
 - 对于```template```的传参，请使用扩展符```{{...data}}```，如果实在你憋不住使用了```{{a:1,b:2}}```这种写法，对象逗号之间请不要换行，后续考虑支持下，暂时没时间了
@@ -34,11 +34,29 @@ killswan -w ./
 
 ### 其他
 - 对文件后缀名替换
-
+- 在项目根目录添加```conver.config.json```文件，目前支持配置pages参数，配置后，会在转换时将```pages```目录下不相关目录删除，同时会删除```app.json```下的```pages```变量，示例：
+```json
+{
+    "baidu": {
+        "pages": [
+            "pages/index/index",
+        ]
+    },
+    "weixin": {
+        "pages": [
+            "pages/index/index",
+        ]
+    },
+    "zhifubao": {
+        "pages": [
+            "pages/index/index",
+        ]
+    }
+}
+```
 ## TODO
-- 模板中```template```的传参需要看下实际情况
 - 对不支持的api需要warning
 - 对自定义组件需要优化
-- 对自闭合标签需要收集
+- 对自闭合标签需要收集，目前只处理了```import, include, input ```
 - 对json的配置需要优化
 - 没有对模板语法中的括号进行递归判断，默认用户的输入是合法的
