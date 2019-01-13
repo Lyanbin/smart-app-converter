@@ -82,8 +82,8 @@ function traverseTemplAst(ast, aimConfig, filePath) {
     // 后续有问题的组件，都写在这里
     if (/^(?:rich-text)$/.test(name)) {
         ast.name = aimConfig.tag[name] ? name : 'view';
-        if (!aimConfig.tag[tag]) {
-            util.warning(`${filePath} \n ${tag} is not supported for your aim app.`);
+        if (!aimConfig.tag[name]) {
+            util.warning(`${filePath} \n ${name} is not supported for your aim app.`);
         }
     }
     if (twoWayBindTag[name]) { // 这些标签需要处理双向绑定的问题
@@ -107,7 +107,7 @@ function traverseTemplAst(ast, aimConfig, filePath) {
 
     }
     if (children && children.length) {
-        traverseTemplAst(ast.children, aimConfig, filePath);
+        ast = traverseTemplAst(ast.children, aimConfig, filePath);
     }
 
     // 条件和循环同时出现了，要处理下，放在处理children之后处理，避免重复循环
