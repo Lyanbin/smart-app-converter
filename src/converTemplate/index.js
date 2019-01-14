@@ -57,7 +57,7 @@ function handleTempl(aimType) {
 function traverseTemplAst(ast, aimConfig, filePath) {
     // 数组继续递归
     if (Array.isArray(ast)) {
-        ast.map(item => {
+        ast = ast.map(item => {
             return traverseTemplAst(item, aimConfig, filePath);
         });
     }
@@ -107,7 +107,7 @@ function traverseTemplAst(ast, aimConfig, filePath) {
 
     }
     if (children && children.length) {
-        ast = traverseTemplAst(ast.children, aimConfig, filePath);
+        ast.children = traverseTemplAst(ast.children, aimConfig, filePath);
     }
 
     // 条件和循环同时出现了，要处理下，放在处理children之后处理，避免重复循环
