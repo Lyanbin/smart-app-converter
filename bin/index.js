@@ -19,6 +19,8 @@ if (program.weixin) {
     parseParam(program.baidu, 'baidu');
 } else if (program.zhifubao) {
     parseParam(program.zhifubao, 'zhifubao');
+} else {
+    util.error('what do u want?');
 }
 
 function parseParam(entryDir, aim) {
