@@ -66,11 +66,11 @@ function handleJs(aimType) {
                     if (T.isCallExpression(path.node.expression) && T.isIdentifier(path.node.expression.callee) && path.node.expression.callee.name === 'App') {
                         let expressionPath = path.get('expression');
                         let paramsArrPath = expressionPath.get('arguments');
-
+                        let vNode = T.objectProperty(T.identifier('__type__'), T.StringLiteral(aimType));
                         if (paramsArrPath.length === 0) {
                             // 没有参数的情况，强塞个进去
-                            
-
+                            let arg = T.objectExpression([T.objectProperty(T.identifier('globalData'), T.objectExpression([vNode]))]);
+                            expressionPath.pushContainer('arguments', arg);
                         } else {
                             let findGlobalData = false;
                             // 一般只有1个参数，对参数0进行处理
@@ -79,14 +79,12 @@ function handleJs(aimType) {
                                 argPropertiesPath.map(argPropertyPath => {
                                     if (T.isObjectProperty(argPropertyPath) && T.isIdentifier(argPropertyPath.node.key) && argPropertyPath.node.key.name === 'globalData') {
                                         findGlobalData = true;
-                                        let vNode = T.objectProperty(T.identifier('__type__'), T.StringLiteral(aimType));
                                         argPropertyPath.get('value').pushContainer('properties', vNode);
                                     }
                                     return argPropertiesPath;
                                 });
                                 if (!findGlobalData) {
-                                    let vNodeChild = T.objectProperty(T.identifier('__type__'), T.StringLiteral(aimType));
-                                    let vNodeFather = T.objectProperty(T.identifier('globalData'), T.objectExpression([vNodeChild]));
+                                    let vNodeFather = T.objectProperty(T.identifier('globalData'), T.objectExpression([vNode]));
                                     paramsArrPath[0].pushContainer('properties', vNodeFather);
                                 }
                             }
