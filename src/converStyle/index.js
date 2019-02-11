@@ -84,8 +84,13 @@ async function handleCssAst(astObj, aimFileType, filePath, dir) {
                             break;
                         }
                     }
-                    return declNode;
                 }
+                if (/^\d+rpx$/.test(declNode.value)) {
+                    let pxValue = declNode.value.replace(/^(\d+)rpx$/, '$1');
+                    let resPxValue = `${pxValue/2}px`
+                    declNode.value = resPxValue;
+                }
+                return declNode;
             }));
             // 微信小程序里不支持通配符，百度的支持，这里给通配符统一转换下，可能有问题，避免使用
             if (item.selector === '*') {
