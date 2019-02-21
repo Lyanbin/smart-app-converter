@@ -12,5 +12,5 @@ module.exports = function converOthers(fileObj, aimType, outDir) {
     let outTruePath = path.join(outDir, fileObj.subPath);
     fs.ensureFileSync(outTruePath);
     fs.copyFileSync(fileObj.truePath, outTruePath);
-    util.logOutPut(fileObj.truePath, outTruePath);
+    // util.logOutPut(fileObj.truePath, outTruePath);
 }
