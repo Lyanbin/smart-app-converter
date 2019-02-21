@@ -16,7 +16,7 @@ module.exports = async function converStyle(fileObj, aimType, outDir) {
     let content = fs.readFileSync(fileObj.truePath).toString();
 
     let astObj = postcss.parse(content);
-    let newAstObj = await handleCssAst(astObj, aimFileExt, fileObj, outDir);
+    let newAstObj = await handleCssAst(astObj, aimFileExt, fileObj);
     let resContent = '';
     postcss.stringify(newAstObj, (str) => {
         resContent += str;
@@ -30,7 +30,7 @@ module.exports = async function converStyle(fileObj, aimType, outDir) {
 }
 
 
-async function handleCssAst(astObj, aimFileExt, fileObj, outDir) {
+async function handleCssAst(astObj, aimFileExt, fileObj) {
     let ast = astObj.nodes || [];
     let resolver = new Assets();
     await Promise.all(ast.map(async (item) => {
@@ -44,7 +44,7 @@ async function handleCssAst(astObj, aimFileExt, fileObj, outDir) {
                     while (imagePath) {
                         let truePath = path.resolve(path.dirname(fileObj.truePath), imagePath);
                         if (/^\//.test(imagePath)) {
-                            truePath = path.resolve(`${outDir}${imagePath}`);
+                            truePath = path.resolve(`${fileObj.entryDir}${imagePath}`);
                         }
                         let pathExists = fs.pathExistsSync(truePath);
                         if (pathExists) {
