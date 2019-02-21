@@ -14,44 +14,35 @@ const twoWayBindTag = {
     'slider': ['value']
 };
 const selfCloseTag = ['import', 'include', 'input'];
-module.exports = function converTempl(dir, aimType) {
-    if (!aimType) {
-        util.error('No aim type, do nothing...');
-        return false;
-    }
-    util.log('Convering the templ files...');
-    util.recursiveReadAllFile(dir, handleTempl(aimType));
-};
+
+module.exports = function converTempl(fileObj, aimType, outDir) {
+    const aimConfig = config[aimType];
+    const aimFileExt = aimConfig.templ;
+    let contentStr = fs.readFileSync(fileObj.truePath).toString();
+    // 对保留的内容标识符修改
+    let needReg = new RegExp(`\\<\\!--${aimType} begin--\\>([\\s\\S]*?)\\<\\!--${aimType} end--\\>`, 'g');
+    contentStr = contentStr.replace(needReg, `<!--${aimType} only begin-->$1<!--${aimType} only end-->`);
+    // 正则删掉独有的内容
+    contentStr = contentStr.replace(/\<\!--(weixin|baidu|zhifubao) begin--\>[\s\S]*?\<\!--\1 end--\>/g, '');
+    // 包一层做适配
+    let content = `<ast-wraper>${contentStr}</ast-wraper>`;
+    const DomHandler = new htmlparser.DomHandler();
+    const Parser = new htmlparser.Parser(DomHandler, {
+        xmlMode: false,
+        lowerCaseAttributeNames: false,
+        recognizeSelfClosing: true,
+        lowerCaseTags: false
+    });
+    Parser.end(content);
+    let ast = DomHandler.dom;
+    let newAst = traverseTemplAst(ast, aimConfig, fileObj.truePath);
+    let newContent = returnHtmlFromAst(newAst);
 
 
-function handleTempl(aimType) {
-    // 这里可以针对不同的aimType做处理
-    const aimFileType = config[aimType].templ;
-    return async function (filePath) {
-        if (path.extname(filePath) === `.${aimFileType}`) {
-            let contentBuffer = await fs.readFile(filePath);
-            let contentStr = contentBuffer.toString();
-            // 对保留的内容标识符修改
-            let needReg = new RegExp(`\\<\\!--${aimType} begin--\\>([\\s\\S]*?)\\<\\!--${aimType} end--\\>`, 'g');
-            contentStr = contentStr.replace(needReg, `<!--${aimType} only begin-->$1<!--${aimType} only end-->`);
-            // 正则删掉独有的内容
-            contentStr = contentStr.replace(/\<\!--(weixin|baidu|zhifubao) begin--\>[\s\S]*?\<\!--\1 end--\>/g, '');
-            // 包一层做适配
-            let content = `<ast-wraper>${contentStr}</ast-wraper>`;
-            const DomHandler = new htmlparser.DomHandler();
-            const Parser = new htmlparser.Parser(DomHandler, {
-                xmlMode: false,
-                lowerCaseAttributeNames: false,
-                recognizeSelfClosing: true,
-                lowerCaseTags: false
-            });
-            Parser.end(content);
-            let ast = DomHandler.dom;
-            let newAst = traverseTemplAst(ast, config[aimType], filePath);
-            let newContent = returnHtmlFromAst(newAst);
-            await fs.writeFile(filePath, newContent);
-        }
-    };
+    let outTruePath = util.pathWithNoExt(path.join(outDir, fileObj.subPath)) + '.' + aimFileExt;
+    fs.ensureFileSync(outTruePath);
+    fs.writeFileSync(outTruePath, newContent);
+    util.logOutPut(fileObj.truePath, outTruePath);
 }
 
 function traverseTemplAst(ast, aimConfig, filePath) {

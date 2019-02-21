@@ -28,7 +28,7 @@ killswan -w <srcPath> [outputPath]
 - 对命名空间进行替换
 
 ### 样式相关
-- 支持less（注：less会替换到当前文件夹下的css文件）
+- ~~支持less（注：less会替换到当前文件夹下的css文件~~
 - 由于微信小程序不允许样式文件中```background```引用本地资源，统一做了base64转换
 - 对通配符```*```做了替换
 

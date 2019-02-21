@@ -21,6 +21,12 @@ module.exports.recursiveReadAllFile = function (dir, cb) {
     });
 }
 
+module.exports.pathWithNoExt = function (filePath) {
+    let ext = path.extname(filePath);
+    let reg = new RegExp(`${ext}$`);
+    return filePath.replace(reg, '');
+}
+
 module.exports.warning = function (context) {
     console.log(chalk.yellow(`[warning]: ${context}`));
 }
@@ -29,10 +35,12 @@ module.exports.error = function (context) {
     console.log(chalk.red(`[error]: ${context}`));
 }
 
-module.exports.log = function(context) {
+module.exports.log = function (context) {
     console.log(`[log]: ${context}`);
 }
-
+module.exports.logOutPut = function (input, output) {
+    console.log(`[log]: ${input} ${chalk.yellow('>>')} ${output}`);
+}
 module.exports.success = function (context) {
     console.log(chalk.green(`[success]: ${context}`));
 }

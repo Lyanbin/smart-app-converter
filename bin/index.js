@@ -2,7 +2,7 @@
 const packageJson = require('../package.json');
 const program = require('commander');
 const path = require('path');
-const converApp = require('../src/index.js');
+const Converter = require('../src/index.js');
 const util = require('../src/util.js');
 const fs = require('fs-extra');
 program.version(packageJson.version)
@@ -35,6 +35,8 @@ function parseParam(entryDir, aim) {
         util.error('Illegal enterDir.');
         return;
     }
+
     let resolvedOutDir = program.args[0] ? path.resolve(program.args[0]) : null;
-    converApp(resolvedEntryDir, resolvedOutDir, aim);
+    const cvter = new Converter(resolvedEntryDir, resolvedOutDir, aim);
+
 }
