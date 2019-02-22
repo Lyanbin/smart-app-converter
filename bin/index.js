@@ -52,33 +52,29 @@ function parseParam(options, aim) {
 
     let resolvedOutDir = options.args[0] ? path.resolve(options.args[0]) : null;
 
-    return {
-        entryDir,
-        converter: new Converter(resolvedEntryDir, resolvedOutDir, aim)
-    };
+    return new Converter(resolvedEntryDir, resolvedOutDir, aim)
 }
 
 function watchParseParam(options, aim) {
-    let res = parseParam(options, aim);
-    if (!res) {
+    let cvter = parseParam(options, aim);
+    if (!cvter) {
         return;
     }
-    chokidar.watch(res.entryDir, {
+    chokidar.watch(cvter.entryDir, {
         ignored: /(^|[\/\\])\../,
         ignoreInitial: true,
         persistent: true
-    }).on('add', listen('add'))
-    .on('change', listen('change'))
-    .on('unlink', listen('unlink'))
-    .on('unlinkDir', listen('unlinkDir'))
+    }).on('add', listen('add', cvter))
+    .on('change', listen('change', cvter))
+    .on('unlink', listen('unlink', cvter))
+    .on('unlinkDir', listen('unlinkDir', cvter))
     .on('error', err => {
         util.error(`Watcher error: ${err}`);
     });
 }
 
-function listen(type) {
+function listen(type, cvter) {
     return (path) => {
-        console.log(type);
-        console.log(path);
+        cvter.digest(type, path);
     }
 }

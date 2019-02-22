@@ -28,7 +28,7 @@ class Converter {
             this.appConfig = fs.readJsonSync(appConfigPath);
         }
 
-        this.paths = this.getPaths(entryDir, aimType, this.appConfig);
+        [this.paths, this.pathPatterns] = this.getPaths(entryDir, aimType, this.appConfig);
 
         this.files = this.getFiles(this.paths, this.entryDir);
         // 清空输出文件夹
@@ -49,7 +49,7 @@ class Converter {
             ...globOpt,
             ignore: ['node_modules/**', '.*']
         });
-
+        let pathPatterns = [];
         if (appConfig && appConfig[aimType] && appConfig[aimType].pages && appConfig[aimType].pages.length) {
             let pathsWithNoPages = glob.sync('**', {
                 ...globOpt,
@@ -57,8 +57,8 @@ class Converter {
             });
             let pathsOfPages = [];
             appConfig[aimType].pages.forEach(pathPattern => {
-                pathPattern = pathPattern.replace(/^\/(.+)/, '$1');
-                pathPattern = pathPattern.replace(/(.+\/)\S+/, '$1**');
+                pathPattern = pathPattern.replace(/^\/(.+)/, '$1').replace(/(.+\/)\S+/, '$1**');
+                pathPatterns.push(pathPattern);
                 let pathArr = glob.sync(pathPattern, {
                     ...globOpt,
                     ignore: ['node_modules/**', '.*']
@@ -67,7 +67,10 @@ class Converter {
             });
             paths = [...pathsWithNoPages, ...pathsOfPages];
         }
-        return paths;
+        return [
+            paths,
+            pathPatterns
+        ];
     }
 
     getFiles(paths = [], entryDir) {
@@ -79,6 +82,27 @@ class Converter {
             }
         });
         return files;
+    }
+
+    digest(type, truePath) {
+        let entryDir = this.entryDir;
+        let aimType = this.aimType;
+        let outDir = this.outDir;
+        let appConfig = this.appConfig
+        let subPath = truePath.replace(entryDir + path.sep, '');
+        if (type === 'change') {
+            let file = this.getFiles([subPath], entryDir);
+            this.files[subPath] = file;
+            this.fire(file, aimType, outDir, appConfig);
+        } else if (type === 'add') {
+            console.log(12);
+        } else if (type === 'addDir') {
+            console.log(2);
+        } else if (type === 'unlink') {
+            console.log(3);
+        } else if (type === 'unlinkDir') {
+            console.log(4);
+        }
     }
 
     fire(files = {}, aimType, outDir, appConfig) {
