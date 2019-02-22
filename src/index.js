@@ -49,7 +49,7 @@ class Converter {
             ...globOpt,
             ignore: ['node_modules/**', '.*']
         });
-    
+
         if (appConfig && appConfig[aimType] && appConfig[aimType].pages && appConfig[aimType].pages.length) {
             let pathsWithNoPages = glob.sync('**', {
                 ...globOpt,

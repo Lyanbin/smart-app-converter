@@ -18,7 +18,7 @@ module.exports = async function converStyle(fileObj, aimType, outDir) {
     let astObj = postcss.parse(content);
     let newAstObj = await handleCssAst(astObj, aimFileExt, fileObj);
     let resContent = '';
-    postcss.stringify(newAstObj, (str) => {
+    postcss.stringify(newAstObj, str => {
         resContent += str;
     });
     // 最后目标文件的路径

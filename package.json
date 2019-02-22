@@ -24,6 +24,7 @@
     "@babel/types": "^7.2.2",
     "assets": "^3.0.1",
     "chalk": "^2.4.1",
+    "chokidar": "^2.1.2",
     "commander": "^2.19.0",
     "fs-extra": "^7.0.1",
     "glob": "^7.1.3",

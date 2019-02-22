@@ -85,6 +85,6 @@ module.exports = function converJs(fileObj, aimType, outDir) {
     let outTruePath = path.join(outDir, fileObj.subPath);
     fs.ensureFileSync(outTruePath);
     fs.writeFileSync(outTruePath, newCode.code);
-    
+
     util.logOutPut(fileObj.truePath, outTruePath);
 }

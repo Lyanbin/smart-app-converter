@@ -5,38 +5,80 @@ const path = require('path');
 const Converter = require('../src/index.js');
 const util = require('../src/util.js');
 const fs = require('fs-extra');
+const chokidar = require('chokidar');
 program.version(packageJson.version)
     .option('-w --weixin <entryDir> [outputDir]', 'Get weixin mini program')
     .option('-z --zhifubao <entryDir> [outputDir]', 'Get zhifubao mini program')
     .option('-b --baidu <entryDir> [outputDir]', 'Get baidu mini program')
+    .option('-x --xxx', 'xxxxxx')
+    .action((...args) => {
+        let options = args[args.length - 1];
+        // 判断输出的类型
+        let aimType = '';
+        if (options.weixin) {
+            aimType = 'weixin';
+        } else if (options.baidu) {
+            aimType = 'baidu';
+        } else if (options.zhifubao) {
+            aimType = 'zhifubao';
+        }
+
+        if (!aimType) {
+            util.error('what do u want?');
+            return;
+        }
+
+        if (options.xxx) {
+            watchParseParam(options, aimType);
+        } else {
+            parseParam(options, aimType);
+        }
+    })
     .usage('<command> <entryDir> [outputDir]');
 
 program.parse(process.argv);
 
-if (program.weixin) {
-    parseParam(program.weixin, 'weixin');
-} else if (program.baidu) {
-    parseParam(program.baidu, 'baidu');
-} else if (program.zhifubao) {
-    parseParam(program.zhifubao, 'zhifubao');
-} else {
-    util.error('what do u want?');
-}
 
-function parseParam(entryDir, aim) {
-    if (!aim) {
-        util.error('what do u want?');
-        return;
-    }
+function parseParam(options, aim) {
+    let entryDir = options[aim];
     let resolvedEntryDir = path.resolve(entryDir);
 
+    // 判断入口是否正常，正常的小程序都有app.json文件
     let entryDirCheckFile = path.resolve(entryDir, 'app.json');
     if (!fs.pathExistsSync(entryDirCheckFile) || !fs.statSync(entryDirCheckFile).isFile()) {
         util.error('Illegal enterDir.');
         return;
     }
 
-    let resolvedOutDir = program.args[0] ? path.resolve(program.args[0]) : null;
-    const cvter = new Converter(resolvedEntryDir, resolvedOutDir, aim);
+    let resolvedOutDir = options.args[0] ? path.resolve(options.args[0]) : null;
 
+    return {
+        entryDir,
+        converter: new Converter(resolvedEntryDir, resolvedOutDir, aim)
+    };
+}
+
+function watchParseParam(options, aim) {
+    let res = parseParam(options, aim);
+    if (!res) {
+        return;
+    }
+    chokidar.watch(res.entryDir, {
+        ignored: /(^|[\/\\])\../,
+        ignoreInitial: true,
+        persistent: true
+    }).on('add', listen('add'))
+    .on('change', listen('change'))
+    .on('unlink', listen('unlink'))
+    .on('unlinkDir', listen('unlinkDir'))
+    .on('error', err => {
+        util.error(`Watcher error: ${err}`);
+    });
+}
+
+function listen(type) {
+    return (path) => {
+        console.log(type);
+        console.log(path);
+    }
 }
