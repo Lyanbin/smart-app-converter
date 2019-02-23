@@ -11,7 +11,7 @@ const converStyle = require('./converStyle/index.js');
 const converJs = require('./converJs/index.js');
 const converTempl = require('./converTemplate/index.js');
 const util = require('./util.js');
-
+const minimatch = require('minimatch');
 
 class Converter {
 
@@ -28,23 +28,23 @@ class Converter {
             this.appConfig = fs.readJsonSync(appConfigPath);
         }
 
-        [this.paths, this.pathPatterns] = this.getPaths(entryDir, aimType, this.appConfig);
+        [this.paths, this.pathPatterns] = this.genPaths(entryDir, this.appConfig);
 
-        this.files = this.getFiles(this.paths, this.entryDir);
+        this.files = this.genFiles(this.paths, this.entryDir);
         // 清空输出文件夹
         fs.ensureDirSync(outDir);
         fs.emptyDirSync(outDir);
 
-        this.fire(this.files, aimType, outDir, this.appConfig);
+        this.fire(this.files);
     }
 
-    getPaths(entryDir, aimType, appConfig = null) {
+    genPaths(entryDir, appConfig = null) {
         const globOpt = {
             cwd: entryDir,
             nodir: true,
             matchBase: true,
         };
-    
+        const aimType = this.aimType;
         let paths = glob.sync('**', {
             ...globOpt,
             ignore: ['node_modules/**', '.*']
@@ -73,7 +73,7 @@ class Converter {
         ];
     }
 
-    getFiles(paths = [], entryDir) {
+    genFiles(paths = [], entryDir) {
         let files = {};
         paths.forEach(item => {
             let truePath = path.join(entryDir, item);
@@ -86,18 +86,29 @@ class Converter {
 
     digest(type, truePath) {
         let entryDir = this.entryDir;
-        let aimType = this.aimType;
-        let outDir = this.outDir;
-        let appConfig = this.appConfig
         let subPath = truePath.replace(entryDir + path.sep, '');
-        if (type === 'change') {
-            let file = this.getFiles([subPath], entryDir);
+        if (type === 'change' && this.files[subPath]) {
+            let file = this.genFiles([subPath], entryDir);
             this.files[subPath] = file;
-            this.fire(file, aimType, outDir, appConfig);
+            this.fire(file);
         } else if (type === 'add') {
-            console.log(12);
-        } else if (type === 'addDir') {
-            console.log(2);
+            let pageReg = new RegExp(`^${entryDir}\\/pages`);
+            if (pageReg.test(truePath) && this.pathPatterns.length) {
+                this.pathPatterns.forEach(pattern => {
+                    let isNeedFile = minimatch(subPath, pattern);
+                    if (isNeedFile) {
+                        let file = this.genFiles([subPath], entryDir);
+                        this.paths.push(subPath);
+                        this.files[subPath] = file;
+                        this.fire(file);
+                    }
+                })
+            } else {
+                let file = this.genFiles([subPath], entryDir);
+                this.paths.push(subPath);
+                this.files[subPath] = file;
+                this.fire(file);
+            }
         } else if (type === 'unlink') {
             console.log(3);
         } else if (type === 'unlinkDir') {
@@ -105,20 +116,20 @@ class Converter {
         }
     }
 
-    fire(files = {}, aimType, outDir, appConfig) {
+    fire(files = {}) {
         for (let file in files) {
             if (files.hasOwnProperty(file)) {
                 if (files[file].isJs) {
-                    converJs(files[file], aimType, outDir);
+                    converJs(files[file], this.aimType, this.outDir);
                 } else if (files[file].isStyle) {
-                    converStyle(files[file], aimType, outDir);
+                    converStyle(files[file], this.aimType, this.outDir);
                 } else if (files[file].isJson) {
-                    converJson(files[file], aimType, outDir, appConfig);
+                    converJson(files[file], this.aimType, this.outDir, this.appConfig);
                 } else if (files[file].isTempl) {
-                    converTempl(files[file], aimType, outDir);
+                    converTempl(files[file], this.aimType, this.outDir);
                 } else {
                     // 如果没匹配上上面的类型，则直接平稳投放
-                    converOthers(files[file], aimType, outDir);
+                    converOthers(files[file], this.aimType, this.outDir);
                 }
             }
         }
