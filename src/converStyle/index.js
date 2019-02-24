@@ -25,7 +25,6 @@ module.exports = async function converStyle(fileObj, aimType, outDir) {
     let outTruePath = util.pathWithNoExt(path.join(outDir, fileObj.subPath)) + '.' + aimFileExt;
     fs.ensureFileSync(outTruePath);
     fs.writeFileSync(outTruePath, resContent);
-
     util.logOutPut(fileObj.truePath, outTruePath);
 }
 

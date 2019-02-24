@@ -33,6 +33,7 @@ module.exports.warning = function (context) {
 
 module.exports.error = function (context) {
     console.log(chalk.red(`[error]: ${context}`));
+    process.exit(1);
 }
 
 module.exports.log = function (context) {

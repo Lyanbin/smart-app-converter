@@ -110,9 +110,9 @@ class Converter {
                 this.fire(file);
             }
         } else if (type === 'unlink') {
-            console.log(3);
+            this.deleFile(subPath);
         } else if (type === 'unlinkDir') {
-            console.log(4);
+            this.deleteDir(subPath);
         }
     }
 
@@ -133,6 +133,34 @@ class Converter {
                 }
             }
         }
+    }
+
+    deleFile(subPath) {
+        let index = this.paths.indexOf(subPath);
+        if (~index) {
+            delete this.files[subPath];
+            this.paths.splice(1, index);
+
+            let outputTruePath = path.join(this.outDir, subPath);
+            fs.unlinkSync(outputTruePath);
+            util.logOutPut(outputTruePath, 'deleted.');
+        }
+    }
+
+    deleteDir(subPath) {
+        let outDir = this.outDir;
+        let truePath = path.join(outDir, subPath);
+        let pathPattern = `${subPath}/**`;
+        let paths = glob.sync(pathPattern, {
+            cwd: outDir,
+            nodir: true,
+            matchBase: true
+        });
+        paths.forEach(subItem => {
+            this.deleFile(subItem);
+        });
+        fs.rmdirSync(truePath);
+        util.logOutPut(truePath, 'deleted.');
     }
 }
 
