@@ -26,7 +26,8 @@ module.exports = {
         tag: {
             'rich-text': true
         },
-        templateData: data => `{{{ ${data} }}}`
+        templateData: data => `{{{ ${data} }}}`,
+        srcInCss: true
     },
     weixin: {
         type: 'weixin',
@@ -51,7 +52,8 @@ module.exports = {
         tag: {
             'rich-text': true
         },
-        templateData: data => `{{ ${data} }}`
+        templateData: data => `{{ ${data} }}`,
+        srcInCss: false
     },
     zhifubao: {
         type: 'zhifubao',
@@ -77,6 +79,7 @@ module.exports = {
         tag: {
             'rich-text': false
         },
-        templateData: data => `{{ ${data} }}`
+        templateData: data => `{{ ${data} }}`,
+        srcInCss: false
     }
 };

@@ -16,7 +16,7 @@ module.exports = async function converStyle(fileObj, aimType, outDir) {
     let content = fs.readFileSync(fileObj.truePath).toString();
 
     let astObj = postcss.parse(content);
-    let newAstObj = await handleCssAst(astObj, aimFileExt, fileObj);
+    let newAstObj = await handleCssAst(astObj, aimConfig, fileObj);
     let resContent = '';
     postcss.stringify(newAstObj, str => {
         resContent += str;
@@ -29,13 +29,13 @@ module.exports = async function converStyle(fileObj, aimType, outDir) {
 }
 
 
-async function handleCssAst(astObj, aimFileExt, fileObj) {
+async function handleCssAst(astObj, aimConfig, fileObj) {
     let ast = astObj.nodes || [];
     let resolver = new Assets();
     await Promise.all(ast.map(async (item) => {
         if (item.type === 'atrule' && item.name === 'import') {
-            item.params = item.params.replace(/\.(?:wxss|css|acss)/ig, `.${aimFileExt}`);
-        } else if (item.type === 'rule') {
+            item.params = item.params.replace(/\.(?:wxss|css|acss)/ig, `.${aimConfig.style}`);
+        } else if (!aimConfig.srcInCss && item.type === 'rule') {
             await Promise.all(item.nodes.map(async (declNode) => {
                 if (/^background(?:-image)?$/.test(declNode.prop)) {
                     let isSourceReg = /url\((['"]?)((?!(data:|https?:|'|"|\/\/)).*?)\1\)/;
